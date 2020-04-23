@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+//Handler
 func Handler(writer http.ResponseWriter, request *http.Request) {
 	if http.MethodGet != request.Method {
 		writer.WriteHeader(http.StatusMethodNotAllowed)

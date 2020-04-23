@@ -12,6 +12,7 @@ import (
 
 var serverHttp *http.Server
 
+//SetupHttp
 func SetupHttp(configs map[string]interface{}) {
 	port := 80
 	if p, ok := configs["port"]; ok {
@@ -59,6 +60,7 @@ func SetupHttp(configs map[string]interface{}) {
 	}
 }
 
+//CloseHttp
 func CloseHttp() error {
 	defer log.Printf("Shutdown monitoring server at %s", serverHttp.Addr)
 	return serverHttp.Shutdown(context.Background())

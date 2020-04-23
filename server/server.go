@@ -32,6 +32,7 @@ func New() *server {
 	return NewWithConfig(DefaultConfig)
 }
 
+//NewWithConfig
 func NewWithConfig(configs map[string]interface{}) *server {
 	port := 8001
 	if p, ok := configs["port"]; ok {
@@ -69,26 +70,31 @@ func NewWithConfig(configs map[string]interface{}) *server {
 	return s
 }
 
+//Stats
 func (s *server) Stats() *server {
 	s.stats = true
 	return s
 }
 
+//HealthCheck
 func (s *server) HealthCheck() *server {
 	s.healthCheck = true
 	return s
 }
 
+//HandleError
 func (s *server) HandleError(handle func(w *worker.Worker, err error)) *server {
 	s.handleError = handle
 	return s
 }
 
+//Worker
 func (s *server) Worker(name string, handle func() error, concurrency int) *server {
 	s.workers = append(s.workers, worker.NewWorker(name, handle, concurrency))
 	return s
 }
 
+//Run
 func (s *server) Run() error {
 	monitoring.SetupHttp(map[string]interface{}{
 		"port":        s.port,
@@ -105,6 +111,7 @@ func (s *server) Run() error {
 	return worker.RunWorkers(s.workers, s.handleError)
 }
 
+//Workers
 func (s *server) Workers() []*worker.Worker {
 	return s.workers
 }

@@ -5,11 +5,13 @@ import (
 	"sync"
 )
 
+//NewWorker
 func NewWorker(name string, handle func() error, replicas int) *Worker {
 	id, _ := uuid.NewUUID()
 	return &Worker{Id: id.String(), Name: name, Handle: handle, Replicas: replicas, subWorkers: make(map[string]*SubWorker)}
 }
 
+//Run
 func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	for i := 1; i <= w.Replicas; i++ {
@@ -31,7 +33,8 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	wg.Wait()
 }
 
-func (w Worker) Status() map[string]int {
+//Status
+func (w *Worker) Status() map[string]int {
 	status := map[string]int{}
 	for _, subWorker := range w.subWorkers {
 		status[subWorker.Name()] = subWorker.Status
