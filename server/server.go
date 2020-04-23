@@ -130,3 +130,4 @@ func (s *server) Run() error {
 func (s *server) Workers() []*worker.Worker {
 	return s.workers
 }
+
