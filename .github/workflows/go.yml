@@ -32,3 +32,11 @@ jobs:
       
     - name: Test
       run: go test -json ./...
+    
+    - name: Github tagger
+      uses: mosfetlang/dev-tagger-action@v1
+      with:
+        # The tag prefix
+        tag-prefix: rc
+        # The remote server
+        origin: default
