@@ -33,9 +33,10 @@ jobs:
     - name: Test
       run: go test -json ./...
     
-    - name: Github tagger
-      uses: mosfetlang/dev-tagger-action@v1
-      with:
-        # The remote server
-        tag-prefix: '' 
-        origin: origin
+    - name: Git Tag Generator
+      uses: ChloePlanet/github-tag-action@2.0.0
+      env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TAG_GENERATOR }}
+          WITH_V: false
+          RELEASE_BRANCHES: master
+
