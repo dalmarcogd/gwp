@@ -37,4 +37,5 @@ jobs:
       uses: mosfetlang/dev-tagger-action@v1
       with:
         # The remote server
+        tag-prefix: '' 
         origin: origin
