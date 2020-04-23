@@ -39,4 +39,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GIT_TAG_GENERATOR }}
           WITH_V: false
           RELEASE_BRANCHES: master
-
