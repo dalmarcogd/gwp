@@ -39,4 +39,4 @@ jobs:
         # The tag prefix
         tag-prefix: rc
         # The remote server
-        origin: default
+        origin: origin
