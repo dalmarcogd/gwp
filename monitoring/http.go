@@ -7,6 +7,7 @@ import (
 	"github.com/dalmarcogd/go-worker-pool/monitoring/stats"
 	"log"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 )
 
@@ -38,6 +39,11 @@ func SetupHttp(configs map[string]interface{}) {
 		hc = h.(bool)
 	}
 
+	debugPprof := false
+	if dp, ok := configs["debugPprof"]; ok {
+		debugPprof = dp.(bool)
+	}
+
 	needHttp := st || hc
 	if needHttp {
 		serveMux := http.NewServeMux()
@@ -47,6 +53,19 @@ func SetupHttp(configs map[string]interface{}) {
 
 		if st {
 			serveMux.HandleFunc(fmt.Sprintf("%s/stats", basePath), stats.Handler)
+		}
+
+		if debugPprof {
+			serveMux.HandleFunc(fmt.Sprintf("%s/debug/pprof/", basePath), pprof.Index)
+			serveMux.HandleFunc(fmt.Sprintf("%s/debug/pprof/cmdline", basePath), pprof.Cmdline)
+			serveMux.HandleFunc(fmt.Sprintf("%s/debug/pprof/trace", basePath), pprof.Trace)
+			serveMux.HandleFunc(fmt.Sprintf("%s/debug/pprof/profile", basePath), pprof.Profile)
+			serveMux.HandleFunc(fmt.Sprintf("%s/debug/pprof/symbol", basePath), pprof.Symbol)
+
+			serveMux.Handle(fmt.Sprintf("%s/debug/pprof/goroutine", basePath), pprof.Handler("goroutine"))
+			serveMux.Handle(fmt.Sprintf("%s/debug/pprof/heap", basePath), pprof.Handler("heap"))
+			serveMux.Handle(fmt.Sprintf("%s/debug/pprof/threadcreate", basePath), pprof.Handler("threadcreate"))
+			serveMux.Handle(fmt.Sprintf("%s/debug/pprof/block", basePath), pprof.Handler("block"))
 		}
 
 		go func(serveMux *http.ServeMux) {

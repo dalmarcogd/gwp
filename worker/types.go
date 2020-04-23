@@ -23,14 +23,15 @@ type (
 
 	//Worker
 	Worker struct {
-		Id         string
-		Name       string
-		StartAt    time.Time
-		FinishedAt time.Time
-		Handle     func() error
-		Replicas   int
-		Errors     chan error
-		subWorkers map[string]*SubWorker
+		Id            string
+		Name          string
+		StartAt       time.Time
+		FinishedAt    time.Time
+		Handle        func() error
+		Replicas      int
+		RestartAlways bool
+		Restarts      int
+		subWorkers    map[string]*SubWorker
 	}
 
 	//WrapperHandleError

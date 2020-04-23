@@ -3,17 +3,27 @@ package worker
 import (
 	"github.com/google/uuid"
 	"sync"
+	"time"
 )
 
 //NewWorker
-func NewWorker(name string, handle func() error, replicas int) *Worker {
+func NewWorker(name string, handle func() error, replicas int, restartAlways bool) *Worker {
 	id, _ := uuid.NewUUID()
-	return &Worker{Id: id.String(), Name: name, Handle: handle, Replicas: replicas, subWorkers: make(map[string]*SubWorker)}
+	return &Worker{
+		Id:            id.String(),
+		Name:          name,
+		Handle:        handle,
+		Replicas:      replicas,
+		RestartAlways: restartAlways,
+		subWorkers:    make(map[string]*SubWorker),
+		Restarts:      0,
+	}
 }
 
 //Run
 func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
+	w.StartAt = time.Now().UTC()
 	for i := 1; i <= w.Replicas; i++ {
 		s := &SubWorker{Id: i, Status: STARTED, Worker: w}
 		w.subWorkers[s.Name()] = s
@@ -40,4 +50,14 @@ func (w *Worker) Status() map[string]int {
 		status[subWorker.Name()] = subWorker.Status
 	}
 	return status
+}
+
+//IsUp
+func (w *Worker) IsUp() bool {
+	for _, v := range w.Status() {
+		if v == STARTED {
+			return true
+		}
+	}
+	return false
 }

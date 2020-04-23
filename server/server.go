@@ -14,6 +14,7 @@ var (
 		"basePath":    "/workers",
 		"stats":       false,
 		"healthCheck": false,
+		"debugPprof":  false,
 	}
 )
 
@@ -23,6 +24,7 @@ type server struct {
 	basePath    string
 	stats       bool
 	healthCheck bool
+	debugPprof  bool
 	workers     []*worker.Worker
 	handleError func(w *worker.Worker, err error)
 }
@@ -58,12 +60,18 @@ func NewWithConfig(configs map[string]interface{}) *server {
 		healthCheck = hc.(bool)
 	}
 
+	debugPprof := false
+	if dpp, ok := configs["debugPprof"]; ok {
+		debugPprof = dpp.(bool)
+	}
+
 	s := &server{
 		port:        port,
 		host:        host,
 		basePath:    basePath,
 		stats:       stats,
 		healthCheck: healthCheck,
+		debugPprof:  debugPprof,
 		workers:     []*worker.Worker{},
 	}
 	runtime.SetServerRun(s)
@@ -82,6 +90,12 @@ func (s *server) HealthCheck() *server {
 	return s
 }
 
+//DebugPprof
+func (s *server) DebugPprof() *server {
+	s.debugPprof = true
+	return s
+}
+
 //HandleError
 func (s *server) HandleError(handle func(w *worker.Worker, err error)) *server {
 	s.handleError = handle
@@ -89,8 +103,8 @@ func (s *server) HandleError(handle func(w *worker.Worker, err error)) *server {
 }
 
 //Worker
-func (s *server) Worker(name string, handle func() error, concurrency int) *server {
-	s.workers = append(s.workers, worker.NewWorker(name, handle, concurrency))
+func (s *server) Worker(name string, handle func() error, concurrency int, restartAlways bool) *server {
+	s.workers = append(s.workers, worker.NewWorker(name, handle, concurrency, restartAlways))
 	return s
 }
 
@@ -101,6 +115,7 @@ func (s *server) Run() error {
 		"host":        s.host,
 		"stats":       s.stats,
 		"healthCheck": s.healthCheck,
+		"debugPprof":  s.debugPprof,
 		"basePath":    s.basePath,
 	})
 	defer func() {

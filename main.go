@@ -13,6 +13,7 @@ func main() {
 		New().
 		Stats().
 		HealthCheck().
+		DebugPprof().
 		HandleError(func(w *worker.Worker, err error) {
 			log.Printf("Worker [%s] error: %s", w.Name, err)
 		}).
@@ -22,21 +23,24 @@ func main() {
 				time.Sleep(10 * time.Second)
 				return errors.New("teste")
 			},
-			5).
+			1,
+			true).
 		Worker(
 			"w2",
 			func() error {
 				time.Sleep(30 * time.Second)
 				return nil
 			},
-			3).
+			1,
+			false).
 		Worker(
 			"w3",
 			func() error {
 				time.Sleep(1 * time.Minute)
 				return errors.New("teste")
 			},
-			2).
+			1,
+			false).
 		//Worker(
 		//	"w4",
 		//	func() error {
