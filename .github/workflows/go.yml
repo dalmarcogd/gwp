@@ -22,7 +22,7 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-
+    
     - name: Get dependencies
       run: go mod download
 
@@ -38,6 +38,7 @@ jobs:
         go get github.com/AlekSi/gocov-xml
         go install github.com/axw/gocov/gocov
         go install github.com/AlekSi/gocov-xml
+        export GOPATH=$HOME/go
         export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
         gocov convert coverage.out | gocov-xml > coverage.xml
       
