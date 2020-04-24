@@ -53,7 +53,13 @@ jobs:
         # Flag upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
         flags: unittests
         # Specify whether or not CI build should fail if Codecov runs into an error during upload
-        fail_ci_if_error: true 
+        fail_ci_if_error: true
+    
+    - name: codacy-analysis-cli
+      uses: mrfyda/codacy-analysis-cli-action@v1.0
+      with:
+        # 
+        project-token: ${{ secrets.CODECY_TOKEN }} 
 
     - name: Git Tag Generator
       uses: ChloePlanet/github-tag-action@2.0.0
