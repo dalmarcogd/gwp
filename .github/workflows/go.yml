@@ -38,6 +38,8 @@ jobs:
       run: |
         go get github.com/axw/gocov/gocov
         go get github.com/AlekSi/gocov-xml
+        go install github.com/axw/gocov/gocov
+        go install github.com/AlekSi/gocov-xml
         gocov convert coverage.out | gocov-xml > coverage.xml
       
     - name: Codecov
