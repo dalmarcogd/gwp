@@ -27,8 +27,6 @@ jobs:
       run: |
         go mod vendor
         go mod download
-        go get github.com/axw/gocov/gocov
-        go get github.com/AlekSi/gocov-xml
 
     - name: Build 
       run: go build -v .
@@ -37,7 +35,10 @@ jobs:
       run: go test -json -coverprofile=coverage.out ./...
     
     - name: Convert to coverage.xml
-      run: gocov convert coverage.out | gocov-xml > coverage.xml
+      run: |
+        go get github.com/axw/gocov/gocov
+        go get github.com/AlekSi/gocov-xml
+        gocov convert coverage.out | gocov-xml > coverage.xml
       
     - name: Codecov
       uses: codecov/codecov-action@v1.0.6
