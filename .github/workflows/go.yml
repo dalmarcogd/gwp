@@ -27,28 +27,35 @@ jobs:
       run: |
         go mod vendor
         go mod download
+        go get github.com/axw/gocov/gocov
+        go get github.com/AlekSi/gocov-xml
 
     - name: Build 
       run: go build -v .
       
     - name: Test
-      run: go test -json ./...
+      run: go test -json -coverprofile=coverage.out ./...
     
+    - name: Convert to coverage.xml
+      run: gocov convert coverage.out | gocov-xml > coverage.xml
+      
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.6
+      with:
+        name: codecov-umbrella
+        # Repository upload token - get it from codecov.io. Required only for private repositories
+        token: ${{ secrets.CODECOV_TOKEN }} 
+        # Path to coverage file to upload
+        file: ./coverage.xml
+        # Flag upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
+        flags: unittests
+        # Specify whether or not CI build should fail if Codecov runs into an error during upload
+        fail_ci_if_error: true 
+
     - name: Git Tag Generator
       uses: ChloePlanet/github-tag-action@2.0.0
       env:
           GITHUB_TOKEN: ${{ secrets.GIT_TAG_GENERATOR }}
           WITH_V: false
           RELEASE_BRANCHES: master
-    - name: Codecov
-      uses: codecov/codecov-action@v1.0.6
-      with:
-        # Repository upload token - get it from codecov.io. Required only for private repositories
-        token: ${{ secrets.CODECOV_TOKEN }} 
-        # Path to coverage file to upload
-        #file: ./coverage.xml
-        # Flag upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
-        flags: unittests
-        # Specify whether or not CI build should fail if Codecov runs into an error during upload
-        fail_ci_if_error: true 
     
