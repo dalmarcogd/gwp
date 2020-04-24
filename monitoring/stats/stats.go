@@ -16,7 +16,7 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	response := map[string]interface{}{
-		"cpus": strconv.Itoa(runtime.NumCPU()),
+		"cpus":       strconv.Itoa(runtime.NumCPU()),
 		"goroutines": strconv.Itoa(runtime.NumGoroutine()),
 		"workers":    []map[string]interface{}{},
 	}
@@ -27,14 +27,14 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 			finishedAt = worker.FinishedAt.Format(time.RFC3339)
 		}
 		response["workers"] = append(response["workers"].([]map[string]interface{}), map[string]interface{}{
-			"id":       worker.Id,
-			"name":     worker.Name,
-			"replicas": worker.Replicas,
+			"id":             worker.Id,
+			"name":           worker.Name,
+			"concurrency":       worker.Concurrency,
 			"restart_always": worker.RestartAlways,
-			"restarts": worker.Restarts,
-			"started_at": worker.StartAt.Format(time.RFC3339),
-			"finished_at": finishedAt,
-			"status":   worker.Status(),
+			"restarts":       worker.Restarts,
+			"started_at":     worker.StartAt.Format(time.RFC3339),
+			"finished_at":    finishedAt,
+			"status":         worker.Status(),
 		})
 	}
 
