@@ -44,7 +44,7 @@ func SetupHttp(configs map[string]interface{}) {
 		debugPprof = dp.(bool)
 	}
 
-	needHttp := st || hc
+	needHttp := st || hc || debugPprof
 	if needHttp {
 		serveMux := http.NewServeMux()
 		if hc {
@@ -81,6 +81,9 @@ func SetupHttp(configs map[string]interface{}) {
 
 //CloseHttp
 func CloseHttp() error {
-	defer log.Printf("Shutdown monitoring server at %s", serverHttp.Addr)
-	return serverHttp.Shutdown(context.Background())
+	if serverHttp != nil {
+		defer log.Printf("Shutdown monitoring server at %s", serverHttp.Addr)
+		return serverHttp.Shutdown(context.Background())
+	}
+	return nil
 }

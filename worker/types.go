@@ -28,7 +28,7 @@ type (
 		StartAt       time.Time
 		FinishedAt    time.Time
 		Handle        func() error
-		Replicas      int
+		Concurrency   int
 		RestartAlways bool
 		Restarts      int
 		subWorkers    map[string]*SubWorker

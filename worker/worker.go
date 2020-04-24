@@ -7,13 +7,13 @@ import (
 )
 
 //NewWorker
-func NewWorker(name string, handle func() error, replicas int, restartAlways bool) *Worker {
+func NewWorker(name string, handle func() error, concurrency int, restartAlways bool) *Worker {
 	id, _ := uuid.NewUUID()
 	return &Worker{
 		Id:            id.String(),
 		Name:          name,
 		Handle:        handle,
-		Replicas:      replicas,
+		Concurrency:   concurrency,
 		RestartAlways: restartAlways,
 		subWorkers:    make(map[string]*SubWorker),
 		Restarts:      0,
@@ -24,7 +24,7 @@ func NewWorker(name string, handle func() error, replicas int, restartAlways boo
 func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	w.StartAt = time.Now().UTC()
-	for i := 1; i <= w.Replicas; i++ {
+	for i := 1; i <= w.Concurrency; i++ {
 		s := &SubWorker{Id: i, Status: STARTED, Worker: w}
 		w.subWorkers[s.Name()] = s
 

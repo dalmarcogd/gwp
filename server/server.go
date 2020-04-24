@@ -18,24 +18,13 @@ var (
 	}
 )
 
-type server struct {
-	port        int
-	host        string
-	basePath    string
-	stats       bool
-	healthCheck bool
-	debugPprof  bool
-	workers     []*worker.Worker
-	handleError func(w *worker.Worker, err error)
-}
-
 //New
-func New() *server {
+func New() *workerServer {
 	return NewWithConfig(DefaultConfig)
 }
 
 //NewWithConfig
-func NewWithConfig(configs map[string]interface{}) *server {
+func NewWithConfig(configs map[string]interface{}) *workerServer {
 	port := 8001
 	if p, ok := configs["port"]; ok {
 		port = p.(int)
@@ -65,7 +54,7 @@ func NewWithConfig(configs map[string]interface{}) *server {
 		debugPprof = dpp.(bool)
 	}
 
-	s := &server{
+	s := &workerServer{
 		port:        port,
 		host:        host,
 		basePath:    basePath,
@@ -79,37 +68,37 @@ func NewWithConfig(configs map[string]interface{}) *server {
 }
 
 //Stats
-func (s *server) Stats() *server {
+func (s *workerServer) Stats() *workerServer {
 	s.stats = true
 	return s
 }
 
 //HealthCheck
-func (s *server) HealthCheck() *server {
+func (s *workerServer) HealthCheck() *workerServer {
 	s.healthCheck = true
 	return s
 }
 
 //DebugPprof
-func (s *server) DebugPprof() *server {
+func (s *workerServer) DebugPprof() *workerServer {
 	s.debugPprof = true
 	return s
 }
 
 //HandleError
-func (s *server) HandleError(handle func(w *worker.Worker, err error)) *server {
+func (s *workerServer) HandleError(handle func(w *worker.Worker, err error)) *workerServer {
 	s.handleError = handle
 	return s
 }
 
 //Worker
-func (s *server) Worker(name string, handle func() error, concurrency int, restartAlways bool) *server {
+func (s *workerServer) Worker(name string, handle func() error, concurrency int, restartAlways bool) *workerServer {
 	s.workers = append(s.workers, worker.NewWorker(name, handle, concurrency, restartAlways))
 	return s
 }
 
 //Run
-func (s *server) Run() error {
+func (s *workerServer) Run() error {
 	monitoring.SetupHttp(map[string]interface{}{
 		"port":        s.port,
 		"host":        s.host,
@@ -120,14 +109,8 @@ func (s *server) Run() error {
 	})
 	defer func() {
 		if err := monitoring.CloseHttp(); err != nil {
-			log.Printf("Error when closed monitoring server at: %s", err)
+			log.Printf("Error when closed monitoring workerServer at: %s", err)
 		}
 	}()
 	return worker.RunWorkers(s.workers, s.handleError)
 }
-
-//Workers
-func (s *server) Workers() []*worker.Worker {
-	return s.workers
-}
-
