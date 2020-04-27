@@ -64,6 +64,7 @@ func (w *Worker) IsUp() bool {
 	return false
 }
 
+//Name
 func (s SubWorker) Name() string {
 	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }

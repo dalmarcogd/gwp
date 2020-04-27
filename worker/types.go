@@ -5,8 +5,11 @@ import (
 )
 
 const (
+	//STARTED
 	STARTED  = "Started"
+	//FINISHED
 	FINISHED = "Finished"
+	//ERROR
 	ERROR    = "Error"
 )
 
