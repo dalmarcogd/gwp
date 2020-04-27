@@ -6,20 +6,20 @@
 
 This package wants to offer the community and implement workers with the pure Go code for Golangers, without any other dependency just Uuid. It allows you to expose an http server to answer the response of health checks, stats, debug pprof and the main "workers". Workers for consumer queues, channel processes and other things that you think worker needs.
 
-# Prerequisites
+## Prerequisites
 Golang version >= [1.14](https://golang.org/doc/devel/release.html#go1.14)
 
-# Features
+## Features
 - Setup http server to monitoring yours;
   - /stats with workers, showing statuses her, number of goroutines, number of cpus and more;
   - /health-check that look for status of workers;
   - /debug/pprof expose all endpoints of investivate golang runtime [http](https://golang.org/pkg/net/http/pprof/);
 - Allow multiple concurrencies of work, handle errors and restart always worker;
 
-# Documentation
+## Documentation
 TODO
 
-# Get started
+## Get started
 #### [Simple Usage](examples/simpleWorker.go) ###
 
 ```go
