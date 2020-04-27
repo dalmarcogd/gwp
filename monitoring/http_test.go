@@ -88,7 +88,7 @@ func TestCloseHTTP(t *testing.T) {
 
 	serverHTTP = nil
 	err = CloseHTTP()
-	if err != nil {
+	if err == nil {
 		t.Errorf("Error when close http: %v", err)
 	}
 }
