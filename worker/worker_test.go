@@ -44,14 +44,14 @@ func TestWorker_Run(t *testing.T) {
 
 	for _, v := range w.Status() {
 		if v != STARTED {
-			t.Errorf("Was expect that worker is with started status, but returned: %d", v)
+			t.Errorf("Was expect that worker is with started status, but returned: %s", v)
 		}
 	}
 
 	<-time.After(2 * time.Second)
 	for _, v := range w.Status() {
 		if v != ERROR {
-			t.Errorf("Was expect that worker is with error status, but returned: %d", v)
+			t.Errorf("Was expect that worker is with error status, but returned: %s", v)
 		}
 	}
 
@@ -75,7 +75,7 @@ func TestWorker_Status(t *testing.T) {
 	<-time.After(1 * time.Second)
 	for _, v := range w.Status() {
 		if v != STARTED {
-			t.Errorf("Was expect that worker is with started status, but returned: %d", v)
+			t.Errorf("Was expect that worker is with started status, but returned: %s", v)
 		}
 	}
 
@@ -95,7 +95,7 @@ func TestWorker_Status(t *testing.T) {
 	<-time.After(1 * time.Second)
 	for _, v := range w.Status() {
 		if v != ERROR {
-			t.Errorf("Was expect that worker is with error status, but returned: %d", v)
+			t.Errorf("Was expect that worker is with error status, but returned: %s", v)
 		}
 	}
 
@@ -115,7 +115,7 @@ func TestWorker_Status(t *testing.T) {
 	<-time.After(1 * time.Second)
 	for _, v := range w.Status() {
 		if v != FINISHED {
-			t.Errorf("Was expect that worker is with finished status, but returned: %d", v)
+			t.Errorf("Was expect that worker is with finished status, but returned: %s", v)
 		}
 	}
 }

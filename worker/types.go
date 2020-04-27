@@ -1,15 +1,13 @@
 package worker
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 )
 
 const (
-	STARTED  = 1
-	FINISHED = 2
-	ERROR    = 3
+	STARTED  = "Started"
+	FINISHED = "Finished"
+	ERROR    = "Error"
 )
 
 type (
@@ -17,7 +15,7 @@ type (
 	SubWorker struct {
 		Worker *Worker
 		ID     int
-		Status int
+		Status string
 		Error  error
 	}
 
@@ -40,7 +38,3 @@ type (
 		err    error
 	}
 )
-
-func (s SubWorker) Name() string {
-	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
-}

@@ -1,7 +1,9 @@
 package worker
 
 import (
+	"fmt"
 	"github.com/google/uuid"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -44,8 +46,8 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 }
 
 //Status
-func (w *Worker) Status() map[string]int {
-	status := map[string]int{}
+func (w *Worker) Status() map[string]string {
+	status := map[string]string{}
 	for _, subWorker := range w.subWorkers {
 		status[subWorker.Name()] = subWorker.Status
 	}
@@ -60,4 +62,8 @@ func (w *Worker) IsUp() bool {
 		}
 	}
 	return false
+}
+
+func (s SubWorker) Name() string {
+	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }

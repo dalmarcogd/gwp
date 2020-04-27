@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/dalmarcogd/go-worker-pool/monitoring/healthcheck"
-	"github.com/dalmarcogd/go-worker-pool/monitoring/stats"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -15,11 +14,11 @@ var serverHTTP *http.Server
 
 //SetupHTTP
 func SetupHTTP(configs map[string]interface{}) {
-	port := 80
+	port := 0
 	if p, ok := configs["port"]; ok {
 		port = p.(int)
 	}
-	host := "localhost"
+	host := ""
 	if h, ok := configs["host"]; ok {
 		host = h.(string)
 	}
@@ -34,9 +33,23 @@ func SetupHTTP(configs map[string]interface{}) {
 		st = s.(bool)
 	}
 
+	var statsFunc func(http.ResponseWriter, *http.Request)
+	if stf, ok := configs["statsFunc"]; ok && stf != nil {
+		statsFunc = stf.(func(http.ResponseWriter, *http.Request))
+	} else {
+		statsFunc = healthcheck.Handler
+	}
+
 	hc := false
 	if h, ok := configs["healthCheck"]; ok {
 		hc = h.(bool)
+	}
+
+	var healthCheckFunc func(http.ResponseWriter, *http.Request)
+	if hcf, ok := configs["healthCheckFunc"]; ok && hcf != nil {
+		healthCheckFunc = hcf.(func(http.ResponseWriter, *http.Request))
+	} else {
+		healthCheckFunc = healthcheck.Handler
 	}
 
 	debugPprof := false
@@ -48,11 +61,11 @@ func SetupHTTP(configs map[string]interface{}) {
 	if needHTTP {
 		serveMux := http.NewServeMux()
 		if hc {
-			serveMux.HandleFunc(fmt.Sprintf("%s/health-check", basePath), healthcheck.Handler)
+			serveMux.HandleFunc(fmt.Sprintf("%s/health-check", basePath), healthCheckFunc)
 		}
 
 		if st {
-			serveMux.HandleFunc(fmt.Sprintf("%s/stats", basePath), stats.Handler)
+			serveMux.HandleFunc(fmt.Sprintf("%s/stats", basePath), statsFunc)
 		}
 
 		if debugPprof {

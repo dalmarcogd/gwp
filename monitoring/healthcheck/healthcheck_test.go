@@ -33,7 +33,7 @@ func TestHandler(t *testing.T) {
 		t.Errorf("Error when decode body responde: %v", err)
 	}
 
-	if !body["status"].(bool)  {
+	if !body["status"].(bool) {
 		t.Errorf("Was expected the status true but returned %t", body["status"].(bool))
 	}
 
@@ -51,7 +51,7 @@ func TestHandler(t *testing.T) {
 		t.Errorf("Error when decode body responde: %v", err)
 	}
 
-	if body["status"].(bool)  {
+	if body["status"].(bool) {
 		t.Errorf("Was expected the status false but returned %t", body["status"].(bool))
 	}
 
