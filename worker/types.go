@@ -16,14 +16,14 @@ type (
 	//SubWorker
 	SubWorker struct {
 		Worker *Worker
-		Id     int
+		ID     int
 		Status int
 		Error  error
 	}
 
 	//Worker
 	Worker struct {
-		Id            string
+		ID            string
 		Name          string
 		StartAt       time.Time
 		FinishedAt    time.Time
@@ -42,5 +42,5 @@ type (
 )
 
 func (s SubWorker) Name() string {
-	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.Id))
+	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }
