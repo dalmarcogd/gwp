@@ -1,5 +1,7 @@
 package runtime
 
+import "github.com/dalmarcogd/go-worker-pool/worker"
+
 var currentServer Server
 
 func init() {
@@ -14,4 +16,8 @@ func SetServerRun(s Server) {
 //GetServerRun
 func GetServerRun() Server {
 	return currentServer
+}
+
+func (f FakeServer) Workers() []*worker.Worker {
+	return []*worker.Worker{}
 }

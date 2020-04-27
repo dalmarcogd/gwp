@@ -17,3 +17,10 @@ func TestSetServerRun(t *testing.T) {
 		t.Error("Runtime server assigned but return nil")
 	}
 }
+
+func TestFakeServer_Workers(t *testing.T) {
+	var f FakeServer
+	if len(f.Workers()) != 0 {
+		t.Error("FakeServer should return empty slice")
+	}
+}

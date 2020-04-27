@@ -11,7 +11,3 @@ type (
 	//FakeServer
 	FakeServer struct{}
 )
-
-func (f FakeServer) Workers() []*worker.Worker {
-	return []*worker.Worker{}
-}
