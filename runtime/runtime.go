@@ -8,16 +8,17 @@ func init() {
 	SetServerRun(FakeServer{})
 }
 
-//SetServerRun
+//SetServerRun set the instance of server that will running
 func SetServerRun(s Server) {
 	currentServer = s
 }
 
-//GetServerRun
+//GetServerRun return the instance of server that still running
 func GetServerRun() Server {
 	return currentServer
 }
 
+//Workers return the worker from FakeServer
 func (f FakeServer) Workers() []*worker.Worker {
 	return []*worker.Worker{}
 }

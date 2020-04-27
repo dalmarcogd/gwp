@@ -12,7 +12,7 @@ import (
 
 var serverHTTP *http.Server
 
-//SetupHTTP
+//SetupHTTP the http server to be used for monitoring the workers
 func SetupHTTP(configs map[string]interface{}) {
 	port := 0
 	if p, ok := configs["port"]; ok {
@@ -92,7 +92,7 @@ func SetupHTTP(configs map[string]interface{}) {
 	}
 }
 
-//CloseHTTP
+//CloseHTTP the http server to be used by monitoring
 func CloseHTTP() error {
 	if serverHTTP != nil {
 		defer log.Printf("Shutdown monitoring server at %s", serverHTTP.Addr)
