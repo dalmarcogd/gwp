@@ -99,6 +99,13 @@ func Test_server_Run(t *testing.T) {
 	}
 }
 
+func Test_server_Run_Error(t *testing.T) {
+
+	if err := New().Run(); err != nil {
+		t.Errorf("Error when run workerServer %v", err)
+	}
+}
+
 func Test_server_Worker(t *testing.T) {
 	nameWorker := "w1"
 	handleWorker := func() error { return nil }

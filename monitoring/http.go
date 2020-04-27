@@ -2,6 +2,7 @@ package monitoring
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/dalmarcogd/go-worker-pool/monitoring/healthcheck"
 	"log"
@@ -92,11 +93,15 @@ func SetupHTTP(configs map[string]interface{}) {
 	}
 }
 
+
+
 //CloseHTTP the http server to be used by monitoring
 func CloseHTTP() error {
 	if serverHTTP != nil {
 		defer log.Printf("Shutdown monitoring server at %s", serverHTTP.Addr)
+		defer func() {serverHTTP = nil}()
 		return serverHTTP.Shutdown(context.Background())
 	}
-	return nil
+
+	return errors.New("the serverHTTP is not configured")
 }
