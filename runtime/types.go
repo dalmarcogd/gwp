@@ -3,15 +3,12 @@ package runtime
 import "github.com/dalmarcogd/go-worker-pool/worker"
 
 type (
-	//Server
+	//Server interface that define the contract to be used between monitoring.http and workerServer
 	Server interface {
 		Workers() []*worker.Worker
 	}
 
-	//FakeServer
+	//FakeServer interface that define the contract to be used between monitoring.http and workerServer
+	//for tests only
 	FakeServer struct{}
 )
-
-func (f FakeServer) Workers() []*worker.Worker {
-	return []*worker.Worker{}
-}
