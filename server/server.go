@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	//DefaultConfig is a default config for start the #workerServer
 	DefaultConfig = map[string]interface{}{
 		"port":        8001,
 		"host":        "localhost",
@@ -19,12 +20,12 @@ var (
 	}
 )
 
-//New
+// New build an #workerServer with #DefaultConfig
 func New() *workerServer {
 	return NewWithConfig(DefaultConfig)
 }
 
-//NewWithConfig
+// NewWithConfig build an #workerServer by the settings
 func NewWithConfig(configs map[string]interface{}) *workerServer {
 	s := &workerServer{
 		config:  configs,
@@ -34,50 +35,50 @@ func NewWithConfig(configs map[string]interface{}) *workerServer {
 	return s
 }
 
-//Stats
+// Stats setup for the server to start with /stats
 func (s *workerServer) Stats() *workerServer {
 	s.config["stats"] = true
 	return s
 }
 
-//HealthCheckFunc
+// StatsFunc setup the handler for /stats
 func (s *workerServer) StatsFunc(f func(writer http.ResponseWriter, request *http.Request)) *workerServer {
 	s.Stats().config["statsFunc"] = f
 	return s
 }
 
-//HealthCheck
+// HealthCheck setup for the server to start with /health-check
 func (s *workerServer) HealthCheck() *workerServer {
 	s.config["healthCheck"] = true
 	return s
 }
 
-//HealthCheckFunc
+// HealthCheckFunc setup the handler for /health-check
 func (s *workerServer) HealthCheckFunc(f func(writer http.ResponseWriter, request *http.Request)) *workerServer {
 	s.HealthCheck().config["healthCheckFunc"] = f
 	return s
 }
 
-//DebugPprof
+// DebugPprof setup for the server to start with /debug/pprof*
 func (s *workerServer) DebugPprof() *workerServer {
 	s.config["debugPprof"] = true
 	return s
 }
 
-//HandleError
+// HandleError setup the a function that will called when to occur and error
 func (s *workerServer) HandleError(handle func(w *worker.Worker, err error)) *workerServer {
 	s.handleError = handle
 	return s
 }
 
-//Worker
+// Worker build an #Worker and add to execution with #workerServer
 func (s *workerServer) Worker(name string, handle func() error, concurrency int, restartAlways bool) *workerServer {
 	w := worker.NewWorker(name, handle, concurrency, restartAlways)
 	s.workers[w.ID] = w
 	return s
 }
 
-//Workers
+// Workers return the slice of #Worker configured
 func (s *workerServer) Workers() []*worker.Worker {
 	v := make([]*worker.Worker, 0, len(s.workers))
 
@@ -87,11 +88,12 @@ func (s *workerServer) Workers() []*worker.Worker {
 	return v
 }
 
+// Configs return the configs from #workerServer
 func (s *workerServer) Configs() map[string]interface{} {
 	return s.config
 }
 
-//Run
+// Run user to start the #workerServer
 func (s *workerServer) Run() error {
 	monitoring.SetupHTTP(s.config)
 	defer func() {

@@ -5,16 +5,17 @@ import (
 )
 
 const (
-	//STARTED
-	STARTED  = "Started"
-	//FINISHED
+	// STARTED is a value used for control which are running
+	STARTED = "Started"
+	// FINISHED is a value used for control which are finished
 	FINISHED = "Finished"
-	//ERROR
-	ERROR    = "Error"
+	// ERROR is a value used for control if has error
+	ERROR = "Error"
 )
 
 type (
-	//SubWorker
+	// SubWorker is a type that represents the concurrency, for the number of concurrency
+	// has an #SubWorker
 	SubWorker struct {
 		Worker *Worker
 		ID     int
@@ -22,7 +23,7 @@ type (
 		Error  error
 	}
 
-	//Worker
+	// Worker is a type that represents an group of concurrency and keep some settings
 	Worker struct {
 		ID            string
 		Name          string
@@ -35,7 +36,7 @@ type (
 		subWorkers    map[string]*SubWorker
 	}
 
-	//WrapperHandleError
+	// WrapperHandleError is a wrapper to transport worker and the error generate inside worker
 	WrapperHandleError struct {
 		worker *Worker
 		err    error
