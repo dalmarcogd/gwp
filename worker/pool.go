@@ -37,7 +37,7 @@ func runWorker(wg *sync.WaitGroup) func(w *Worker, errors chan WrapperHandleErro
 				w.FinishedAt = time.Now().UTC()
 				break
 			}
-			w.Restarts += 1
+			w.Restarts++
 			log.Printf("Worker [%s] restarted", w.Name)
 		}
 	}

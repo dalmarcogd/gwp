@@ -99,7 +99,7 @@ func (s *workerServer) Worker(name string, handle func() error, concurrency int,
 
 //Run
 func (s *workerServer) Run() error {
-	monitoring.SetupHttp(map[string]interface{}{
+	monitoring.SetupHTTP(map[string]interface{}{
 		"port":        s.port,
 		"host":        s.host,
 		"stats":       s.stats,
@@ -108,7 +108,7 @@ func (s *workerServer) Run() error {
 		"basePath":    s.basePath,
 	})
 	defer func() {
-		if err := monitoring.CloseHttp(); err != nil {
+		if err := monitoring.CloseHTTP(); err != nil {
 			log.Printf("Error when closed monitoring workerServer at: %s", err)
 		}
 	}()

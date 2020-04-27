@@ -27,7 +27,7 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 			finishedAt = worker.FinishedAt.Format(time.RFC3339)
 		}
 		response["workers"] = append(response["workers"].([]map[string]interface{}), map[string]interface{}{
-			"id":             worker.Id,
+			"id":             worker.ID,
 			"name":           worker.Name,
 			"concurrency":       worker.Concurrency,
 			"restart_always": worker.RestartAlways,

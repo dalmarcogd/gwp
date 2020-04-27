@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func TestSetupHttp(t *testing.T) {
-	SetupHttp(map[string]interface{}{
+func TestSetupHTTP(t *testing.T) {
+	SetupHTTP(map[string]interface{}{
 		"port":        8002,
 		"host":        "localhost",
 		"stats":       true,
@@ -60,14 +60,14 @@ func TestSetupHttp(t *testing.T) {
 
 	<-time.After(1 * time.Second)
 
-	err := CloseHttp()
+	err := CloseHTTP()
 	if err != nil {
 		t.Errorf("Error when close http: %v", err)
 	}
 }
 
-func TestCloseHttp(t *testing.T) {
-	SetupHttp(map[string]interface{}{
+func TestCloseHTTP(t *testing.T) {
+	SetupHTTP(map[string]interface{}{
 		"port":        8002,
 		"host":        "localhost",
 		"stats":       true,
@@ -77,7 +77,7 @@ func TestCloseHttp(t *testing.T) {
 	})
 
 	<-time.After(1 * time.Second)
-	err := CloseHttp()
+	err := CloseHTTP()
 	if err != nil {
 		t.Errorf("Error when close http: %v", err)
 	}

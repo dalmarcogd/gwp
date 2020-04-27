@@ -11,10 +11,10 @@ import (
 	"strconv"
 )
 
-var serverHttp *http.Server
+var serverHTTP *http.Server
 
-//SetupHttp
-func SetupHttp(configs map[string]interface{}) {
+//SetupHTTP
+func SetupHTTP(configs map[string]interface{}) {
 	port := 80
 	if p, ok := configs["port"]; ok {
 		port = p.(int)
@@ -44,8 +44,8 @@ func SetupHttp(configs map[string]interface{}) {
 		debugPprof = dp.(bool)
 	}
 
-	needHttp := st || hc || debugPprof
-	if needHttp {
+	needHTTP := st || hc || debugPprof
+	if needHTTP {
 		serveMux := http.NewServeMux()
 		if hc {
 			serveMux.HandleFunc(fmt.Sprintf("%s/health-check", basePath), healthcheck.Handler)
@@ -71,19 +71,19 @@ func SetupHttp(configs map[string]interface{}) {
 		go func(serveMux *http.ServeMux) {
 			address := fmt.Sprintf("%s:%s", host, strconv.Itoa(port))
 			log.Printf("Started monitoring server at %s", address)
-			serverHttp = &http.Server{Addr: address, Handler: serveMux}
-			if err := serverHttp.ListenAndServe(); err != nil {
+			serverHTTP = &http.Server{Addr: address, Handler: serveMux}
+			if err := serverHTTP.ListenAndServe(); err != nil {
 				log.Print(err)
 			}
 		}(serveMux)
 	}
 }
 
-//CloseHttp
-func CloseHttp() error {
-	if serverHttp != nil {
-		defer log.Printf("Shutdown monitoring server at %s", serverHttp.Addr)
-		return serverHttp.Shutdown(context.Background())
+//CloseHTTP
+func CloseHTTP() error {
+	if serverHTTP != nil {
+		defer log.Printf("Shutdown monitoring server at %s", serverHTTP.Addr)
+		return serverHTTP.Shutdown(context.Background())
 	}
 	return nil
 }

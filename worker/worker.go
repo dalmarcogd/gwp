@@ -10,7 +10,7 @@ import (
 func NewWorker(name string, handle func() error, concurrency int, restartAlways bool) *Worker {
 	id, _ := uuid.NewUUID()
 	return &Worker{
-		Id:            id.String(),
+		ID:            id.String(),
 		Name:          name,
 		Handle:        handle,
 		Concurrency:   concurrency,
@@ -25,7 +25,7 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	w.StartAt = time.Now().UTC()
 	for i := 1; i <= w.Concurrency; i++ {
-		s := &SubWorker{Id: i, Status: STARTED, Worker: w}
+		s := &SubWorker{ID: i, Status: STARTED, Worker: w}
 		w.subWorkers[s.Name()] = s
 
 		wg.Add(1)
