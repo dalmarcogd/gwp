@@ -1,27 +1,29 @@
 package worker
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 )
 
 const (
-	STARTED  = 1
-	FINISHED = 2
-	ERROR    = 3
+	// STARTED is a value used for control which are running
+	STARTED = "Started"
+	// FINISHED is a value used for control which are finished
+	FINISHED = "Finished"
+	// ERROR is a value used for control if has error
+	ERROR = "Error"
 )
 
 type (
-	//SubWorker
+	// SubWorker is a type that represents the concurrency, for the number of concurrency
+	// has an #SubWorker
 	SubWorker struct {
 		Worker *Worker
 		ID     int
-		Status int
+		Status string
 		Error  error
 	}
 
-	//Worker
+	// Worker is a type that represents an group of concurrency and keep some settings
 	Worker struct {
 		ID            string
 		Name          string
@@ -34,13 +36,9 @@ type (
 		subWorkers    map[string]*SubWorker
 	}
 
-	//WrapperHandleError
+	// WrapperHandleError is a wrapper to transport worker and the error generate inside worker
 	WrapperHandleError struct {
 		worker *Worker
 		err    error
 	}
 )
-
-func (s SubWorker) Name() string {
-	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
-}

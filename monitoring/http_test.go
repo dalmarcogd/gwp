@@ -1,6 +1,8 @@
 package monitoring
 
 import (
+	"github.com/dalmarcogd/go-worker-pool/monitoring/healthcheck"
+	"github.com/dalmarcogd/go-worker-pool/monitoring/stats"
 	"net/http"
 	"testing"
 	"time"
@@ -8,12 +10,14 @@ import (
 
 func TestSetupHTTP(t *testing.T) {
 	SetupHTTP(map[string]interface{}{
-		"port":        8002,
-		"host":        "localhost",
-		"stats":       true,
-		"healthCheck": true,
-		"debugPprof":  true,
-		"basePath":    "",
+		"port":            8002,
+		"host":            "localhost",
+		"stats":           true,
+		"statsFunc":       stats.Handler,
+		"healthCheck":     true,
+		"healthCheckFunc": healthcheck.Handler,
+		"debugPprof":      true,
+		"basePath":        "",
 	})
 
 	<-time.After(1 * time.Second)
@@ -78,6 +82,12 @@ func TestCloseHTTP(t *testing.T) {
 
 	<-time.After(1 * time.Second)
 	err := CloseHTTP()
+	if err != nil {
+		t.Errorf("Error when close http: %v", err)
+	}
+
+	serverHTTP = nil
+	err = CloseHTTP()
 	if err != nil {
 		t.Errorf("Error when close http: %v", err)
 	}

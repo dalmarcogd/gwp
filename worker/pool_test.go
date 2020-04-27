@@ -15,7 +15,7 @@ func TestRunWorkers(t *testing.T) {
 	workers := []*Worker{
 		NewWorker("w1",
 			func() error {
-				<- time.After(1 * time.Second)
+				<-time.After(1 * time.Second)
 				return nil
 			},
 			1,
@@ -36,7 +36,6 @@ func TestRunWorkers(t *testing.T) {
 	}
 }
 
-
 func Test_runWorkerHandleError(t *testing.T) {
 	hasError := false
 	handleErrors := func(w *Worker, err error) {
@@ -47,7 +46,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 	workers := []*Worker{
 		NewWorker("w1",
 			func() error {
-				<- time.After(1 * time.Second)
+				<-time.After(1 * time.Second)
 				return errors.New("happened some error")
 			},
 			1,

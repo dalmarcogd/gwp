@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-//RunWorkers
+// RunWorkers is a function that administrate the workers and yours errors
 func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error {
 	var wg sync.WaitGroup
 

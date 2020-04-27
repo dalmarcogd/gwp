@@ -1,12 +1,15 @@
 package worker
 
 import (
+	"fmt"
 	"github.com/google/uuid"
+	"strconv"
 	"sync"
 	"time"
 )
 
-//NewWorker
+// NewWorker is a constructor for #Worker and give
+// for user some default settings
 func NewWorker(name string, handle func() error, concurrency int, restartAlways bool) *Worker {
 	id, _ := uuid.NewUUID()
 	return &Worker{
@@ -20,7 +23,8 @@ func NewWorker(name string, handle func() error, concurrency int, restartAlways 
 	}
 }
 
-//Run
+// Run is a executed inside goroutine by #RunWorkers
+// He administrate the number of concurrency
 func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	w.StartAt = time.Now().UTC()
@@ -43,16 +47,17 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	wg.Wait()
 }
 
-//Status
-func (w *Worker) Status() map[string]int {
-	status := map[string]int{}
+// Status return a map with status from the each #SubWorker
+func (w *Worker) Status() map[string]string {
+	status := map[string]string{}
 	for _, subWorker := range w.subWorkers {
 		status[subWorker.Name()] = subWorker.Status
 	}
 	return status
 }
 
-//IsUp
+// IsUp check if anyone #SubWorker still #STARTED,
+// this survey responds if it is running
 func (w *Worker) IsUp() bool {
 	for _, v := range w.Status() {
 		if v == STARTED {
@@ -60,4 +65,10 @@ func (w *Worker) IsUp() bool {
 		}
 	}
 	return false
+}
+
+// Name return the name of #SubWorker
+// the pattern is %s-%s <- #Worker.Name, #SubWorker.ID
+func (s SubWorker) Name() string {
+	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }

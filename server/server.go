@@ -5,9 +5,11 @@ import (
 	"github.com/dalmarcogd/go-worker-pool/runtime"
 	"github.com/dalmarcogd/go-worker-pool/worker"
 	"log"
+	"net/http"
 )
 
 var (
+	//DefaultConfig is a default config for start the #workerServer
 	DefaultConfig = map[string]interface{}{
 		"port":        8001,
 		"host":        "localhost",
@@ -18,99 +20,86 @@ var (
 	}
 )
 
-//New
+// New build an #workerServer with #DefaultConfig
 func New() *workerServer {
 	return NewWithConfig(DefaultConfig)
 }
 
-//NewWithConfig
+// NewWithConfig build an #workerServer by the settings
 func NewWithConfig(configs map[string]interface{}) *workerServer {
-	port := 8001
-	if p, ok := configs["port"]; ok {
-		port = p.(int)
-	}
-	host := "localhost"
-	if h, ok := configs["host"]; ok {
-		host = h.(string)
-	}
-
-	basePath := "/workers"
-	if bp, ok := configs["basePath"]; ok {
-		basePath = bp.(string)
-	}
-
-	stats := false
-	if s, ok := configs["stats"]; ok {
-		stats = s.(bool)
-	}
-
-	healthCheck := false
-	if hc, ok := configs["healthCheck"]; ok {
-		healthCheck = hc.(bool)
-	}
-
-	debugPprof := false
-	if dpp, ok := configs["debugPprof"]; ok {
-		debugPprof = dpp.(bool)
-	}
-
 	s := &workerServer{
-		port:        port,
-		host:        host,
-		basePath:    basePath,
-		stats:       stats,
-		healthCheck: healthCheck,
-		debugPprof:  debugPprof,
-		workers:     []*worker.Worker{},
+		config:  configs,
+		workers: map[string]*worker.Worker{},
 	}
 	runtime.SetServerRun(s)
 	return s
 }
 
-//Stats
+// Stats setup for the server to start with /stats
 func (s *workerServer) Stats() *workerServer {
-	s.stats = true
+	s.config["stats"] = true
 	return s
 }
 
-//HealthCheck
+// StatsFunc setup the handler for /stats
+func (s *workerServer) StatsFunc(f func(writer http.ResponseWriter, request *http.Request)) *workerServer {
+	s.Stats().config["statsFunc"] = f
+	return s
+}
+
+// HealthCheck setup for the server to start with /health-check
 func (s *workerServer) HealthCheck() *workerServer {
-	s.healthCheck = true
+	s.config["healthCheck"] = true
 	return s
 }
 
-//DebugPprof
+// HealthCheckFunc setup the handler for /health-check
+func (s *workerServer) HealthCheckFunc(f func(writer http.ResponseWriter, request *http.Request)) *workerServer {
+	s.HealthCheck().config["healthCheckFunc"] = f
+	return s
+}
+
+// DebugPprof setup for the server to start with /debug/pprof*
 func (s *workerServer) DebugPprof() *workerServer {
-	s.debugPprof = true
+	s.config["debugPprof"] = true
 	return s
 }
 
-//HandleError
+// HandleError setup the a function that will called when to occur and error
 func (s *workerServer) HandleError(handle func(w *worker.Worker, err error)) *workerServer {
 	s.handleError = handle
 	return s
 }
 
-//Worker
+// Worker build an #Worker and add to execution with #workerServer
 func (s *workerServer) Worker(name string, handle func() error, concurrency int, restartAlways bool) *workerServer {
-	s.workers = append(s.workers, worker.NewWorker(name, handle, concurrency, restartAlways))
+	w := worker.NewWorker(name, handle, concurrency, restartAlways)
+	s.workers[w.ID] = w
 	return s
 }
 
-//Run
+// Workers return the slice of #Worker configured
+func (s *workerServer) Workers() []*worker.Worker {
+	v := make([]*worker.Worker, 0, len(s.workers))
+
+	for _, value := range s.workers {
+		v = append(v, value)
+	}
+	return v
+}
+
+// Configs return the configs from #workerServer
+func (s *workerServer) Configs() map[string]interface{} {
+	return s.config
+}
+
+// Run user to start the #workerServer
 func (s *workerServer) Run() error {
-	monitoring.SetupHTTP(map[string]interface{}{
-		"port":        s.port,
-		"host":        s.host,
-		"stats":       s.stats,
-		"healthCheck": s.healthCheck,
-		"debugPprof":  s.debugPprof,
-		"basePath":    s.basePath,
-	})
+	monitoring.SetupHTTP(s.config)
 	defer func() {
 		if err := monitoring.CloseHTTP(); err != nil {
 			log.Printf("Error when closed monitoring workerServer at: %s", err)
 		}
 	}()
-	return worker.RunWorkers(s.workers, s.handleError)
+	return worker.RunWorkers(s.Workers(), s.handleError)
 }
