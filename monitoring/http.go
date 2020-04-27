@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dalmarcogd/go-worker-pool/monitoring/healthcheck"
+	"github.com/dalmarcogd/go-worker-pool/monitoring/stats"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -38,7 +39,7 @@ func SetupHTTP(configs map[string]interface{}) {
 	if stf, ok := configs["statsFunc"]; ok && stf != nil {
 		statsFunc = stf.(func(http.ResponseWriter, *http.Request))
 	} else {
-		statsFunc = healthcheck.Handler
+		statsFunc = stats.Handler
 	}
 
 	hc := false
