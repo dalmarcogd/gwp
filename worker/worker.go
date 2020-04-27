@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// The NewWorker is a constructor for #Worker and give
+// NewWorker is a constructor for #Worker and give
 // for user some default settings
 func NewWorker(name string, handle func() error, concurrency int, restartAlways bool) *Worker {
 	id, _ := uuid.NewUUID()
@@ -23,7 +23,7 @@ func NewWorker(name string, handle func() error, concurrency int, restartAlways 
 	}
 }
 
-// This method #Run is a executed inside goroutine by #RunWorkers
+// Run is a executed inside goroutine by #RunWorkers
 // He administrate the number of concurrency
 func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
