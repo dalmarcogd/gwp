@@ -35,3 +35,4 @@ TODO
 #### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorkerConsumeRabbit.go) ###
 ```go
 ```
+
