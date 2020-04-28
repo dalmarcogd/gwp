@@ -2,7 +2,7 @@ package gwp
 
 import (
 	"fmt"
-	"github.com/dalmarcogd/go-worker-pool/worker"
+	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"testing"
 )

@@ -1,8 +1,8 @@
 
 ![Go](https://github.com/dalmarcogd/gwp/workflows/Go/badge.svg)
-[![codecov](https://codecov.io/gh/dalmarcogd/gwp/branch/master/graph/badge.svg)](https://codecov.io/gh/dalmarcogd/go-worker-pool)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/beee52f22195471abea544a19ee6304a)](https://www.codacy.com/manual/dalmarco.gd/go-worker-pool?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dalmarcogd/go-worker-pool&amp;utm_campaign=Badge_Grade)
-[![Go Report Card](https://goreportcard.com/badge/github.com/dalmarcogd/go-worker-pool)](https://goreportcard.com/report/github.com/dalmarcogd/go-worker-pool)
+[![codecov](https://codecov.io/gh/dalmarcogd/gwp/branch/master/graph/badge.svg)](https://codecov.io/gh/dalmarcogd/gwp)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/beee52f22195471abea544a19ee6304a)](https://www.codacy.com/manual/dalmarco.gd/gwp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dalmarcogd/gwp&amp;utm_campaign=Badge_Grade)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dalmarcogd/gwp)](https://goreportcard.com/report/github.com/dalmarcogd/gwp)
 
 # gwp
 
@@ -23,16 +23,16 @@ TODO
 
 ## Examples
 
-#### [Simple Worker](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorker.go) ###
+#### [Simple Worker](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorker.go) ###
 
 ```go
 ```
 
-#### [Simple Worker Consume SQS](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorkerConsumeSQS.go) ###
+#### [Simple Worker Consume SQS](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeSQS.go) ###
 ```go
 ```
 
-#### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorkerConsumeRabbit.go) ###
+#### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeRabbit.go) ###
 ```go
 ```
 

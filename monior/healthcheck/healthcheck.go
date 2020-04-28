@@ -2,7 +2,7 @@ package healthcheck
 
 import (
 	"encoding/json"
-	"github.com/dalmarcogd/go-worker-pool/runtime"
+	"github.com/dalmarcogd/gwp/runtime"
 	"net/http"
 )
 

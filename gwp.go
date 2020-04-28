@@ -1,9 +1,9 @@
 package gwp
 
 import (
-	"github.com/dalmarcogd/go-worker-pool/monior"
-	"github.com/dalmarcogd/go-worker-pool/runtime"
-	"github.com/dalmarcogd/go-worker-pool/worker"
+	"github.com/dalmarcogd/gwp/monior"
+	"github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/worker"
 	"log"
 	"net/http"
 )

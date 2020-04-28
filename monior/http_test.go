@@ -1,8 +1,8 @@
 package monior
 
 import (
-	"github.com/dalmarcogd/go-worker-pool/monior/healthcheck"
-	"github.com/dalmarcogd/go-worker-pool/monior/stats"
+	"github.com/dalmarcogd/gwp/monior/healthcheck"
+	"github.com/dalmarcogd/gwp/monior/stats"
 	"net/http"
 	"testing"
 	"time"

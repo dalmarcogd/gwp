@@ -2,7 +2,7 @@ package stats
 
 import (
 	"encoding/json"
-	gwpr "github.com/dalmarcogd/go-worker-pool/runtime"
+	gwpr "github.com/dalmarcogd/gwp/runtime"
 	"net/http"
 	"runtime"
 	"strconv"

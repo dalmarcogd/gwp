@@ -2,8 +2,8 @@ package stats
 
 import (
 	"encoding/json"
-	"github.com/dalmarcogd/go-worker-pool/runtime"
-	"github.com/dalmarcogd/go-worker-pool/worker"
+	"github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"net/http/httptest"
 	"testing"
