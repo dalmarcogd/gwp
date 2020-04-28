@@ -1,4 +1,4 @@
-package go_worker_pool
+package gwp
 
 import (
 	"github.com/dalmarcogd/go-worker-pool/monior"
