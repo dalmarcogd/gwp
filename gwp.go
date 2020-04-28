@@ -1,7 +1,7 @@
 package gwp
 
 import (
-	"github.com/dalmarcogd/gwp/monior"
+	"github.com/dalmarcogd/gwp/monitor"
 	"github.com/dalmarcogd/gwp/runtime"
 	"github.com/dalmarcogd/gwp/worker"
 	"log"
@@ -107,10 +107,10 @@ func (s *WorkerServer) Configs() map[string]interface{} {
 
 // Run user to start the #WorkerServer
 func (s *WorkerServer) Run() error {
-	monior.SetupHTTP(s.config)
+	monitor.SetupHTTP(s.config)
 	defer func() {
-		if err := monior.CloseHTTP(); err != nil {
-			log.Printf("Error when closed monior WorkerServer at: %s", err)
+		if err := monitor.CloseHTTP(); err != nil {
+			log.Printf("Error when closed monitor WorkerServer at: %s", err)
 		}
 	}()
 	return worker.RunWorkers(s.Workers(), s.handleError)
