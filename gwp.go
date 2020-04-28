@@ -27,7 +27,7 @@ var (
 	}
 )
 
-// New build an #workerServer with #DefaultConfig
+// New build an #workerServer with #defaultConfig
 func New() *workerServer {
 	return NewWithConfig(defaultConfig)
 }

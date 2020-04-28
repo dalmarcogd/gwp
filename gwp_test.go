@@ -9,23 +9,23 @@ import (
 
 func TestNew(t *testing.T) {
 	s := New()
-	if s.Configs()["port"] != DefaultConfig["port"] {
-		t.Errorf("Port is different of default port %d != %d", s.Configs()["port"], DefaultConfig["port"])
+	if s.Configs()["port"] != defaultConfig["port"] {
+		t.Errorf("Port is different of default port %d != %d", s.Configs()["port"], defaultConfig["port"])
 	}
-	if s.Configs()["host"] != DefaultConfig["host"] {
-		t.Errorf("Host is different of default host %s != %s", s.Configs()["host"], DefaultConfig["host"])
+	if s.Configs()["host"] != defaultConfig["host"] {
+		t.Errorf("Host is different of default host %s != %s", s.Configs()["host"], defaultConfig["host"])
 	}
-	if s.Configs()["basePath"] != DefaultConfig["basePath"] {
-		t.Errorf("BasePath is different of default basePath %s != %s", s.Configs()["basePath"], DefaultConfig["basePath"])
+	if s.Configs()["basePath"] != defaultConfig["basePath"] {
+		t.Errorf("BasePath is different of default basePath %s != %s", s.Configs()["basePath"], defaultConfig["basePath"])
 	}
-	if s.Configs()["stats"] != DefaultConfig["stats"] {
-		t.Errorf("Stats is different of default stats %t != %t", s.Configs()["stats"], DefaultConfig["stats"])
+	if s.Configs()["stats"] != defaultConfig["stats"] {
+		t.Errorf("Stats is different of default stats %t != %t", s.Configs()["stats"], defaultConfig["stats"])
 	}
-	if s.Configs()["healthCheck"] != DefaultConfig["healthCheck"] {
-		t.Errorf("HealthCheck is different of default healthCheck %t != %t", s.Configs()["healthCheck"], DefaultConfig["healthCheck"])
+	if s.Configs()["healthCheck"] != defaultConfig["healthCheck"] {
+		t.Errorf("HealthCheck is different of default healthCheck %t != %t", s.Configs()["healthCheck"], defaultConfig["healthCheck"])
 	}
-	if s.Configs()["debugPprof"] != DefaultConfig["debugPprof"] {
-		t.Errorf("DebugPprof is different of default debugPprof %t != %t", s.Configs()["debugPprof"], DefaultConfig["debugPprof"])
+	if s.Configs()["debugPprof"] != defaultConfig["debugPprof"] {
+		t.Errorf("DebugPprof is different of default debugPprof %t != %t", s.Configs()["debugPprof"], defaultConfig["debugPprof"])
 	}
 }
 
