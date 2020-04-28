@@ -63,6 +63,7 @@ func TestNewWithConfig(t *testing.T) {
 		"healthCheck": true,
 		"debugPprof":  true,
 	}
+
 	s = NewWithConfig(config)
 	if s.Configs()["port"] != defaultConfig["port"] {
 		t.Errorf("Port is different of default port %d != %d", s.Configs()["port"], defaultConfig["port"])
