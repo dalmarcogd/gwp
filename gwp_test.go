@@ -70,39 +70,39 @@ func Test_server_HandleError(t *testing.T) {
 func Test_server_HealthCheck(t *testing.T) {
 	s := New().HealthCheck()
 	if !s.Configs()["healthCheck"].(bool) {
-		t.Error("HealthCheck setup on workerServer and his not enable")
+		t.Error("HealthCheck setup on WorkerServer and his not enable")
 	}
 }
 
 func Test_server_Stats(t *testing.T) {
 	s := New().Stats()
 	if !s.Configs()["stats"].(bool) {
-		t.Error("Stats setup on workerServer and his not enable")
+		t.Error("Stats setup on WorkerServer and his not enable")
 	}
 }
 
 func Test_server_DebugPprof(t *testing.T) {
 	s := New().DebugPprof()
 	if !s.Configs()["debugPprof"].(bool) {
-		t.Error("DebugPprof setup on workerServer and his not enable")
+		t.Error("DebugPprof setup on WorkerServer and his not enable")
 	}
 }
 
 func Test_server_Run(t *testing.T) {
 	s := New().Worker("w1", func() error { return nil }, 1, false)
 	if err := s.Run(); err != nil {
-		t.Errorf("Error when run workerServer %v", err)
+		t.Errorf("Error when run WorkerServer %v", err)
 	}
 	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func() error { return nil }, 1, false)
 	if err := s.Run(); err != nil {
-		t.Errorf("Error when run workerServer %v", err)
+		t.Errorf("Error when run WorkerServer %v", err)
 	}
 }
 
 func Test_server_Run_Error(t *testing.T) {
 
 	if err := New().Run(); err != nil {
-		t.Errorf("Error when run workerServer %v", err)
+		t.Errorf("Error when run WorkerServer %v", err)
 	}
 }
 
