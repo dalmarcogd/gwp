@@ -1,4 +1,4 @@
-module github.com/dalmarcogd/go-worker-pool
+module github.com/dalmarcogd/gwp
 
 go 1.14
 
