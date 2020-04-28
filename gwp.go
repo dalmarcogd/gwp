@@ -14,7 +14,6 @@ type workerServer struct {
 	handleError func(w *worker.Worker, err error)
 }
 
-
 var (
 	//defaultConfig is a default config for start the #workerServer
 	defaultConfig = map[string]interface{}{

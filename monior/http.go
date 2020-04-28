@@ -94,13 +94,11 @@ func SetupHTTP(configs map[string]interface{}) {
 	}
 }
 
-
-
 //CloseHTTP the http server to be used by monior
 func CloseHTTP() error {
 	if serverHTTP != nil {
 		defer log.Printf("Shutdown monior server at %s", serverHTTP.Addr)
-		defer func() {serverHTTP = nil}()
+		defer func() { serverHTTP = nil }()
 		return serverHTTP.Shutdown(context.Background())
 	}
 
