@@ -1,16 +1,15 @@
-package main
+package examples
 
 import (
 	"errors"
-	"github.com/dalmarcogd/go-worker-pool/server"
+	"github.com/dalmarcogd/go-worker-pool"
 	"github.com/dalmarcogd/go-worker-pool/worker"
 	"log"
 	"time"
 )
 
 func main() {
-	if err := server.
-		New().
+	if err := go_worker_pool.New().
 		Stats().
 		HealthCheck().
 		DebugPprof().

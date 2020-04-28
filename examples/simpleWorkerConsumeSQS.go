@@ -1,11 +1,11 @@
-package main
+package examples
 
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/dalmarcogd/go-worker-pool/server"
+	"github.com/dalmarcogd/go-worker-pool"
 	"github.com/dalmarcogd/go-worker-pool/worker"
 	"log"
 	"strconv"
@@ -41,8 +41,7 @@ func main() {
 		fmt.Println(respSend)
 	}
 
-	if err := server.
-		New().
+	if err := go_worker_pool.New().
 		Stats().
 		HealthCheck().
 		DebugPprof().
