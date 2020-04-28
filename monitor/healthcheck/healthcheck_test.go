@@ -1,9 +1,9 @@
-package stats
+package healthcheck
 
 import (
 	"encoding/json"
-	"github.com/dalmarcogd/go-worker-pool/runtime"
-	"github.com/dalmarcogd/go-worker-pool/worker"
+	"github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	req, err := http.NewRequest(http.MethodGet, "/stats", nil)
+	req, err := http.NewRequest(http.MethodGet, "/health-check", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,11 +33,11 @@ func TestHandler(t *testing.T) {
 		t.Errorf("Error when decode body responde: %v", err)
 	}
 
-	if len(body["workers"].([]interface{})) != 0 {
-		t.Errorf("Was expected any one worker but returned %d", len(body["workers"].([]interface{})))
+	if !body["status"].(bool) {
+		t.Errorf("Was expected the status true but returned %t", body["status"].(bool))
 	}
 
-	runtime.SetServerRun(STFakeServer{})
+	runtime.SetServerRun(HCFakeServer{})
 
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
@@ -51,11 +51,11 @@ func TestHandler(t *testing.T) {
 		t.Errorf("Error when decode body responde: %v", err)
 	}
 
-	if len(body["workers"].([]interface{})) != 1 {
-		t.Errorf("Was expected one worker but returned %d", len(body["workers"].([]interface{})))
+	if body["status"].(bool) {
+		t.Errorf("Was expected the status false but returned %t", body["status"].(bool))
 	}
 
-	req, err = http.NewRequest(http.MethodPost, "/stats", nil)
+	req, err = http.NewRequest(http.MethodPost, "/health-check", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,9 +69,9 @@ func TestHandler(t *testing.T) {
 	}
 }
 
-type STFakeServer struct{}
+type HCFakeServer struct{}
 
-func (STFakeServer) Workers() []*worker.Worker {
+func (HCFakeServer) Workers() []*worker.Worker {
 	w := worker.NewWorker("w1", func() error {
 		return nil
 	}, 1, false)

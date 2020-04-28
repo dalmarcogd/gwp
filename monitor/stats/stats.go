@@ -2,14 +2,14 @@ package stats
 
 import (
 	"encoding/json"
-	gwpr "github.com/dalmarcogd/go-worker-pool/runtime"
+	gwpr "github.com/dalmarcogd/gwp/runtime"
 	"net/http"
 	"runtime"
 	"strconv"
 	"time"
 )
 
-//Handler
+//Handler that return the stats from workerServer
 func Handler(writer http.ResponseWriter, request *http.Request) {
 	if http.MethodGet != request.Method {
 		writer.WriteHeader(http.StatusMethodNotAllowed)

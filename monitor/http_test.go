@@ -1,8 +1,8 @@
-package monior
+package monitor
 
 import (
-	"github.com/dalmarcogd/go-worker-pool/monior/healthcheck"
-	"github.com/dalmarcogd/go-worker-pool/monior/stats"
+	"github.com/dalmarcogd/gwp/monitor/healthcheck"
+	"github.com/dalmarcogd/gwp/monitor/stats"
 	"net/http"
 	"testing"
 	"time"

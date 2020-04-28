@@ -1,11 +1,11 @@
-package monior
+package monitor
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/dalmarcogd/go-worker-pool/monior/healthcheck"
-	"github.com/dalmarcogd/go-worker-pool/monior/stats"
+	"github.com/dalmarcogd/gwp/monitor/healthcheck"
+	"github.com/dalmarcogd/gwp/monitor/stats"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -14,7 +14,7 @@ import (
 
 var serverHTTP *http.Server
 
-//SetupHTTP the http server to be used for monior the workers
+//SetupHTTP the http server to be used for monitor the workers
 func SetupHTTP(configs map[string]interface{}) {
 	port := 0
 	if p, ok := configs["port"]; ok {
@@ -85,7 +85,7 @@ func SetupHTTP(configs map[string]interface{}) {
 
 		go func(serveMux *http.ServeMux) {
 			address := fmt.Sprintf("%s:%s", host, strconv.Itoa(port))
-			log.Printf("Started monior server at %s", address)
+			log.Printf("Started monitor server at %s", address)
 			serverHTTP = &http.Server{Addr: address, Handler: serveMux}
 			if err := serverHTTP.ListenAndServe(); err != nil {
 				log.Print(err)
@@ -94,13 +94,11 @@ func SetupHTTP(configs map[string]interface{}) {
 	}
 }
 
-
-
-//CloseHTTP the http server to be used by monior
+//CloseHTTP the http server to be used by monitor
 func CloseHTTP() error {
 	if serverHTTP != nil {
-		defer log.Printf("Shutdown monior server at %s", serverHTTP.Addr)
-		defer func() {serverHTTP = nil}()
+		defer log.Printf("Shutdown monitor server at %s", serverHTTP.Addr)
+		defer func() { serverHTTP = nil }()
 		return serverHTTP.Shutdown(context.Background())
 	}
 

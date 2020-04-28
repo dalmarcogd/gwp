@@ -1,6 +1,6 @@
 package runtime
 
-import "github.com/dalmarcogd/go-worker-pool/worker"
+import "github.com/dalmarcogd/gwp/worker"
 
 var currentServer Server
 

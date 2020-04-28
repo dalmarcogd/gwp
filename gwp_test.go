@@ -2,7 +2,7 @@ package gwp
 
 import (
 	"fmt"
-	"github.com/dalmarcogd/go-worker-pool/worker"
+	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"testing"
 )
@@ -57,6 +57,32 @@ func TestNewWithConfig(t *testing.T) {
 	if s.Configs()["debugPprof"] != config["debugPprof"] {
 		t.Errorf("DebugPprof is different of default debugPprof %t != %t", s.Configs()["debugPprof"], config["debugPprof"])
 	}
+
+	config = map[string]interface{}{
+		"stats":       true,
+		"healthCheck": true,
+		"debugPprof":  true,
+	}
+
+	s = NewWithConfig(config)
+	if s.Configs()["port"] != defaultConfig["port"] {
+		t.Errorf("Port is different of default port %d != %d", s.Configs()["port"], defaultConfig["port"])
+	}
+	if s.Configs()["host"] != defaultConfig["host"] {
+		t.Errorf("Host is different of default host %s != %s", s.Configs()["host"], defaultConfig["host"])
+	}
+	if s.Configs()["basePath"] != defaultConfig["basePath"] {
+		t.Errorf("BasePath is different of default basePath %s != %s", s.Configs()["basePath"], defaultConfig["basePath"])
+	}
+	if s.Configs()["stats"] != config["stats"] {
+		t.Errorf("Stats is different of default stats %t != %t", s.Configs()["stats"], config["stats"])
+	}
+	if s.Configs()["healthCheck"] != config["healthCheck"] {
+		t.Errorf("HealthCheck is different of default healthCheck %t != %t", s.Configs()["healthCheck"], config["healthCheck"])
+	}
+	if s.Configs()["debugPprof"] != config["debugPprof"] {
+		t.Errorf("DebugPprof is different of default debugPprof %t != %t", s.Configs()["debugPprof"], config["debugPprof"])
+	}
 }
 
 func Test_server_HandleError(t *testing.T) {
@@ -70,39 +96,39 @@ func Test_server_HandleError(t *testing.T) {
 func Test_server_HealthCheck(t *testing.T) {
 	s := New().HealthCheck()
 	if !s.Configs()["healthCheck"].(bool) {
-		t.Error("HealthCheck setup on workerServer and his not enable")
+		t.Error("HealthCheck setup on WorkerServer and his not enable")
 	}
 }
 
 func Test_server_Stats(t *testing.T) {
 	s := New().Stats()
 	if !s.Configs()["stats"].(bool) {
-		t.Error("Stats setup on workerServer and his not enable")
+		t.Error("Stats setup on WorkerServer and his not enable")
 	}
 }
 
 func Test_server_DebugPprof(t *testing.T) {
 	s := New().DebugPprof()
 	if !s.Configs()["debugPprof"].(bool) {
-		t.Error("DebugPprof setup on workerServer and his not enable")
+		t.Error("DebugPprof setup on WorkerServer and his not enable")
 	}
 }
 
 func Test_server_Run(t *testing.T) {
 	s := New().Worker("w1", func() error { return nil }, 1, false)
 	if err := s.Run(); err != nil {
-		t.Errorf("Error when run workerServer %v", err)
+		t.Errorf("Error when run WorkerServer %v", err)
 	}
 	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func() error { return nil }, 1, false)
 	if err := s.Run(); err != nil {
-		t.Errorf("Error when run workerServer %v", err)
+		t.Errorf("Error when run WorkerServer %v", err)
 	}
 }
 
 func Test_server_Run_Error(t *testing.T) {
 
 	if err := New().Run(); err != nil {
-		t.Errorf("Error when run workerServer %v", err)
+		t.Errorf("Error when run WorkerServer %v", err)
 	}
 }
 
