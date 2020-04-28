@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+//WorkerServer is a server that administrate the workers and the monitor
 type WorkerServer struct {
 	config      map[string]interface{}
 	workers     map[string]*worker.Worker
