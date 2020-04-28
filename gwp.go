@@ -1,16 +1,23 @@
-package server
+package gwp
 
 import (
-	"github.com/dalmarcogd/go-worker-pool/monitoring"
+	"github.com/dalmarcogd/go-worker-pool/monior"
 	"github.com/dalmarcogd/go-worker-pool/runtime"
 	"github.com/dalmarcogd/go-worker-pool/worker"
 	"log"
 	"net/http"
 )
 
+type workerServer struct {
+	config      map[string]interface{}
+	workers     map[string]*worker.Worker
+	handleError func(w *worker.Worker, err error)
+}
+
+
 var (
-	//DefaultConfig is a default config for start the #workerServer
-	DefaultConfig = map[string]interface{}{
+	//defaultConfig is a default config for start the #workerServer
+	defaultConfig = map[string]interface{}{
 		"port":        8001,
 		"host":        "localhost",
 		"basePath":    "/workers",
@@ -20,9 +27,9 @@ var (
 	}
 )
 
-// New build an #workerServer with #DefaultConfig
+// New build an #workerServer with #defaultConfig
 func New() *workerServer {
-	return NewWithConfig(DefaultConfig)
+	return NewWithConfig(defaultConfig)
 }
 
 // NewWithConfig build an #workerServer by the settings
@@ -95,10 +102,10 @@ func (s *workerServer) Configs() map[string]interface{} {
 
 // Run user to start the #workerServer
 func (s *workerServer) Run() error {
-	monitoring.SetupHTTP(s.config)
+	monior.SetupHTTP(s.config)
 	defer func() {
-		if err := monitoring.CloseHTTP(); err != nil {
-			log.Printf("Error when closed monitoring workerServer at: %s", err)
+		if err := monior.CloseHTTP(); err != nil {
+			log.Printf("Error when closed monior workerServer at: %s", err)
 		}
 	}()
 	return worker.RunWorkers(s.Workers(), s.handleError)
