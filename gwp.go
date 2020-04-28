@@ -16,8 +16,8 @@ type workerServer struct {
 
 
 var (
-	//DefaultConfig is a default config for start the #workerServer
-	DefaultConfig = map[string]interface{}{
+	//defaultConfig is a default config for start the #workerServer
+	defaultConfig = map[string]interface{}{
 		"port":        8001,
 		"host":        "localhost",
 		"basePath":    "/workers",
@@ -29,7 +29,7 @@ var (
 
 // New build an #workerServer with #DefaultConfig
 func New() *workerServer {
-	return NewWithConfig(DefaultConfig)
+	return NewWithConfig(defaultConfig)
 }
 
 // NewWithConfig build an #workerServer by the settings
