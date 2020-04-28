@@ -57,6 +57,31 @@ func TestNewWithConfig(t *testing.T) {
 	if s.Configs()["debugPprof"] != config["debugPprof"] {
 		t.Errorf("DebugPprof is different of default debugPprof %t != %t", s.Configs()["debugPprof"], config["debugPprof"])
 	}
+
+	config = map[string]interface{}{
+		"stats":       true,
+		"healthCheck": true,
+		"debugPprof":  true,
+	}
+	s = NewWithConfig(config)
+	if s.Configs()["port"] != defaultConfig["port"] {
+		t.Errorf("Port is different of default port %d != %d", s.Configs()["port"], defaultConfig["port"])
+	}
+	if s.Configs()["host"] != defaultConfig["host"] {
+		t.Errorf("Host is different of default host %s != %s", s.Configs()["host"], defaultConfig["host"])
+	}
+	if s.Configs()["basePath"] != defaultConfig["basePath"] {
+		t.Errorf("BasePath is different of default basePath %s != %s", s.Configs()["basePath"], defaultConfig["basePath"])
+	}
+	if s.Configs()["stats"] != config["stats"] {
+		t.Errorf("Stats is different of default stats %t != %t", s.Configs()["stats"], config["stats"])
+	}
+	if s.Configs()["healthCheck"] != config["healthCheck"] {
+		t.Errorf("HealthCheck is different of default healthCheck %t != %t", s.Configs()["healthCheck"], config["healthCheck"])
+	}
+	if s.Configs()["debugPprof"] != config["debugPprof"] {
+		t.Errorf("DebugPprof is different of default debugPprof %t != %t", s.Configs()["debugPprof"], config["debugPprof"])
+	}
 }
 
 func Test_server_HandleError(t *testing.T) {
