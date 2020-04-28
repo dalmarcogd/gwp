@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-//Handler
+//Handler that return a health check response
 func Handler(writer http.ResponseWriter, request *http.Request) {
 	if http.MethodGet != request.Method {
 		writer.WriteHeader(http.StatusMethodNotAllowed)

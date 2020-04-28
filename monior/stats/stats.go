@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//Handler
+//Handler that return the stats from workerServer
 func Handler(writer http.ResponseWriter, request *http.Request) {
 	if http.MethodGet != request.Method {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
