@@ -20,6 +20,10 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+    
     # Runs a single command using the runners shell
     - name: Curl to proxy.golang
-      run: curl https://proxy.golang.org/github.com/dalmarcogd/gwp/@latest
+      run: curl https://proxy.golang.org/github.com/dalmarcogd/gwp/@v/${{ steps.get_version.outputs.VERSION }}.info
