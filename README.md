@@ -23,7 +23,7 @@ TODO
 
 ## Examples
 
-#### [Simple Worker](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorker.go) ###
+#### [Simple Worker](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorker/simpleWorker.go) ###
 
 ```go
 package main
@@ -75,7 +75,7 @@ func main() {
 }
 ```
 
-#### [Simple Worker Consume SQS](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeSQS.go) ###
+#### [Simple Worker Consume SQS](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeSQS/simpleWorkerConsumeSQS.go) ###
 ```go
 package main
 
@@ -151,7 +151,7 @@ func main() {
 }
 ```
 
-#### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeRabbit.go) ###
+#### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeRabbit/simpleWorkerConsumeRabbit.go) ###
 ```go
 package main
 
@@ -220,6 +220,57 @@ func main() {
 			}
 			return nil
 		}, 1, true).
+		Run(); err != nil {
+		panic(err)
+	}
+}
+```
+
+#### [Simple Worker Consume Channel](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerChannels/simpleWorkerChannels.go) ###
+```go
+package main
+
+import (
+	"github.com/dalmarcogd/gwp"
+	"github.com/dalmarcogd/gwp/worker"
+	"log"
+	"time"
+)
+
+func main() {
+
+	ch := make(chan bool)
+
+	if err := gwp.
+		New().
+		Stats().
+		HealthCheck().
+		DebugPprof().
+		HandleError(func(w *worker.Worker, err error) {
+			log.Printf("Worker [%s] error: %s", w.Name, err)
+		}).
+		Worker(
+			"w1",
+			func() error {
+				<-time.After(10 * time.Second)
+				ch <- true
+				log.Printf("Produced %t", true)
+				return nil
+			},
+			1,
+			true).
+		Worker(
+			"w2",
+			func() error {
+				for {
+					select {
+					case r := <-ch:
+						log.Printf("Received %t", r)
+					}
+				}
+			},
+			1,
+			false).
 		Run(); err != nil {
 		panic(err)
 	}
