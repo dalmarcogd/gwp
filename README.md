@@ -3,8 +3,10 @@
 [![codecov](https://codecov.io/gh/dalmarcogd/gwp/branch/master/graph/badge.svg)](https://codecov.io/gh/dalmarcogd/gwp)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/beee52f22195471abea544a19ee6304a)](https://www.codacy.com/manual/dalmarco.gd/gwp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dalmarcogd/gwp&amp;utm_campaign=Badge_Grade)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dalmarcogd/gwp)](https://goreportcard.com/report/github.com/dalmarcogd/gwp)
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/dalmarcogd/gwp)
+[![license](https://img.shields.io/hexpm/l/apa)](https://pkg.go.dev/github.com/dalmarcogd/gwp/blob/master/LICENSE.md)
 
-# gwp
+# gwp - Go Worker Pool
 
 This package wants to offer the community and implement workers with the pure Go code for Golangers, without any other dependency just Uuid. It allows you to expose an http server to answer the response of health checks, stats, debug pprof and the main "workers". Workers for consumer queues, channel processes and other things that you think worker needs.
 
@@ -19,7 +21,9 @@ Golang version >= [1.14](https://golang.org/doc/devel/release.html#go1.14)
 - Allow multiple concurrencies of work, handle errors and restart always worker;
 
 ## Documentation
-TODO
+For examples visit godoc#pkg-examples
+
+For GoDoc reference, visit [pkg.go.dev](https://pkg.go.dev/github.com/dalmarcogd/gwp)
 
 ## Examples
 
