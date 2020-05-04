@@ -24,3 +24,10 @@ func TestFakeServer_Workers(t *testing.T) {
 		t.Error("FakeServer should return empty slice")
 	}
 }
+
+func TestFakeServer_Healthy(t *testing.T) {
+	var f FakeServer
+	if !f.Healthy() {
+		t.Error("FakeServer should return true healthy, but returned false")
+	}
+}

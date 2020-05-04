@@ -121,7 +121,7 @@ func TestWorker_Status(t *testing.T) {
 	}
 }
 
-func TestWorker_IsUp(t *testing.T) {
+func TestWorker_Healthy(t *testing.T) {
 	nameWorker := "w1"
 	handleWorker := func() error {
 		<-time.After(3 * time.Second)
@@ -136,11 +136,11 @@ func TestWorker_IsUp(t *testing.T) {
 		close(errors)
 	}()
 	<-time.After(1 * time.Second)
-	if !w.IsUp() {
+	if !w.Healthy() {
 		t.Errorf("Was expect that worker is Up, but returned: Down")
 	}
 	<-time.After(3 * time.Second)
-	if w.IsUp() {
+	if w.Healthy() {
 		t.Errorf("Was expect that worker is Down, but returned: Up")
 	}
 }

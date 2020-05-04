@@ -13,16 +13,8 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	status := true
-	for _, worker := range runtime.GetServerRun().Workers() {
-		if !worker.IsUp() {
-			status = false
-			break
-		}
-	}
-
 	writer.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(writer).Encode(map[string]interface{}{
-		"status": status,
+		"status": runtime.GetServerRun().Healthy(),
 	})
 }
