@@ -5,6 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/dalmarcogd/gwp)](https://goreportcard.com/report/github.com/dalmarcogd/gwp)
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/dalmarcogd/gwp)
 [![license](https://img.shields.io/hexpm/l/apa)](https://pkg.go.dev/github.com/dalmarcogd/gwp/blob/master/LICENSE.md)
+[![Release](https://img.shields.io/github/v/release/dalmarcogd/gwp.svg?style=flat-square)](https://github.com/dalmarcogd/gwp/releases)
 
 # gwp - Go Worker Pool
 
