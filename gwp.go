@@ -110,7 +110,7 @@ func (s *WorkerServer) Workers() []*worker.Worker {
 	return v
 }
 
-// Workers return the slice of #Worker configured
+// Healthy return true or false if the WorkerServer its ok or no, respectively
 func (s *WorkerServer) Healthy() bool {
 	status := true
 	for _, healthy := range s.healthy {
