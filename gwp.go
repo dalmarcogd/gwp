@@ -13,6 +13,7 @@ type WorkerServer struct {
 	config      map[string]interface{}
 	workers     map[string]*worker.Worker
 	handleError func(w *worker.Worker, err error)
+	healthy     []func() bool
 }
 
 var (
@@ -43,6 +44,7 @@ func NewWithConfig(configs map[string]interface{}) *WorkerServer {
 	s := &WorkerServer{
 		config:  configs,
 		workers: map[string]*worker.Worker{},
+		healthy: []func() bool {},
 	}
 	runtime.SetServerRun(s)
 	return s
@@ -63,6 +65,12 @@ func (s *WorkerServer) StatsFunc(f func(writer http.ResponseWriter, request *htt
 // HealthCheck setup for the server to start with /health-check
 func (s *WorkerServer) HealthCheck() *WorkerServer {
 	s.config["healthCheck"] = true
+	return s
+}
+
+// CheckHealth includes to server checker the health
+func (s *WorkerServer) CheckHealth(check func() bool) *WorkerServer {
+	s.healthy = append(s.healthy, check)
 	return s
 }
 
@@ -88,17 +96,30 @@ func (s *WorkerServer) HandleError(handle func(w *worker.Worker, err error)) *Wo
 func (s *WorkerServer) Worker(name string, handle func() error, concurrency int, restartAlways bool) *WorkerServer {
 	w := worker.NewWorker(name, handle, concurrency, restartAlways)
 	s.workers[w.ID] = w
-	return s
+	return s.CheckHealth(func() bool {
+		return w.Healthy()
+	})
 }
 
 // Workers return the slice of #Worker configured
 func (s *WorkerServer) Workers() []*worker.Worker {
 	v := make([]*worker.Worker, 0, len(s.workers))
-
 	for _, value := range s.workers {
 		v = append(v, value)
 	}
 	return v
+}
+
+// Workers return the slice of #Worker configured
+func (s *WorkerServer) Healthy() bool {
+	status := true
+	for _, healthy := range s.healthy {
+		if !healthy() {
+			status = false
+			break
+		}
+	}
+	return status
 }
 
 // Configs return the configs from #WorkerServer

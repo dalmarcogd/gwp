@@ -22,3 +22,11 @@ func GetServerRun() Server {
 func (f FakeServer) Workers() []*worker.Worker {
 	return []*worker.Worker{}
 }
+
+//Healthy return the health of server
+func (f FakeServer) Healthy() bool {
+	return true
+}
+
+
+

@@ -5,6 +5,7 @@ import (
 	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestNew(t *testing.T) {
@@ -126,7 +127,6 @@ func Test_server_Run(t *testing.T) {
 }
 
 func Test_server_Run_Error(t *testing.T) {
-
 	if err := New().Run(); err != nil {
 		t.Errorf("Error when run WorkerServer %v", err)
 	}
@@ -134,7 +134,10 @@ func Test_server_Run_Error(t *testing.T) {
 
 func Test_server_Worker(t *testing.T) {
 	nameWorker := "w1"
-	handleWorker := func() error { return nil }
+	handleWorker := func() error {
+		<-time.After(3 * time.Second)
+		return nil
+	}
 	concurrencyWorker := 1
 	restartAlwaysWorker := false
 	s := New().Worker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
@@ -155,6 +158,15 @@ func Test_server_Worker(t *testing.T) {
 	if w.RestartAlways != restartAlwaysWorker {
 		t.Errorf("RestartAlaways of worker if different from setup %t != %t", w.RestartAlways, restartAlwaysWorker)
 	}
+	go func() {
+		if err := s.Run(); err != nil {
+			t.Error(err)
+		}
+	}()
+	<-time.After(1 * time.Second)
+	if !s.Healthy() {
+		t.Error("Healthy expected is true but returned false")
+	}
 }
 
 func Test_workerServer_StatsFunc(t *testing.T) {
@@ -168,5 +180,24 @@ func Test_workerServer_HealthCheckFunc(t *testing.T) {
 	s := New().HealthCheckFunc(func(writer http.ResponseWriter, request *http.Request) {})
 	if _, ok := s.config["healthCheckFunc"]; !ok {
 		t.Error("HealthCheckFunc is setup but still nil")
+	}
+}
+
+func TestWorkerServer_Healthy(t *testing.T) {
+	s := New().CheckHealth(func() bool {
+		return true
+	})
+	if !s.Healthy() {
+		t.Error("Healthy expected is true but returned false")
+	}
+	s = New().CheckHealth(func() bool {
+		return false
+	})
+	if s.Healthy() {
+		t.Error("Healthy expected is false but returned true")
+	}
+	s = New()
+	if !s.Healthy() {
+		t.Error("Healthy expected is true but returned false")
 	}
 }

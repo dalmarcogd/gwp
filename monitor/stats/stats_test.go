@@ -71,6 +71,10 @@ func TestHandler(t *testing.T) {
 
 type STFakeServer struct{}
 
+func (s STFakeServer) Healthy() bool {
+	return true
+}
+
 func (STFakeServer) Workers() []*worker.Worker {
 	w := worker.NewWorker("w1", func() error {
 		return nil

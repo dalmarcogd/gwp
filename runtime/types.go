@@ -6,6 +6,11 @@ type (
 	//Server interface that define the contract to be used between monitor.http and workerServer
 	Server interface {
 		Workers() []*worker.Worker
+		Healthy() bool
+	}
+
+	CheckHealthy interface {
+		Healthy() bool
 	}
 
 	//FakeServer interface that define the contract to be used between monitor.http and workerServer
