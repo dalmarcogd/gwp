@@ -32,7 +32,7 @@ For GoDoc reference, visit [pkg.go.dev](https://pkg.go.dev/github.com/dalmarcogd
 
 ## Examples
 
-#### [Simple Worker](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorker/simpleWorker.go) ###
+#### [Simple Worker](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorker/simpleWorker.go) ###
 
 ```go
 package main
@@ -84,7 +84,7 @@ func main() {
 }
 ```
 
-#### [Simple Worker Consume SQS](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeSQS/simpleWorkerConsumeSQS.go) ###
+#### [Simple Worker Consume SQS](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorkerConsumeSQS/simpleWorkerConsumeSQS.go) ###
 ```go
 package main
 
@@ -162,7 +162,7 @@ func main() {
 }
 ```
 
-#### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerConsumeRabbit/simpleWorkerConsumeRabbit.go) ###
+#### [Simple Worker Consume Rabbit](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorkerConsumeRabbit/simpleWorkerConsumeRabbit.go) ###
 ```go
 package main
 
@@ -237,7 +237,7 @@ func main() {
 }
 ```
 
-#### [Simple Worker Consume Channel](https://github.com/dalmarcogd/test-gwp/blob/master/simpleWorkerChannels/simpleWorkerChannels.go) ###
+#### [Simple Worker Consume Channel](https://github.com/dalmarcogd/test-go-worker-pool/blob/master/simpleWorkerChannels/simpleWorkerChannels.go) ###
 ```go
 package main
 
