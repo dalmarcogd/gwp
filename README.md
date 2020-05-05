@@ -12,6 +12,9 @@
 
 This package wants to offer the community and implement workers with the pure Go code for Golangers, without any other dependency just Uuid. It allows you to expose an http server to answer the response of health checks, stats, debug pprof and the main "workers". Workers for consumer queues, channel processes and other things that you think worker needs.
 
+![image](http://drive.google.com/uc?export=view&id=1sUnDpUnJewRGFiurnPDj5fCcyWt_aJgS)
+
+
 ## Prerequisites
 Golang version >= [1.14](https://golang.org/doc/devel/release.html#go1.14)
 
