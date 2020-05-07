@@ -21,7 +21,7 @@ func Example_Simple_Worker() {
 			"w1",
 			func() error {
 				time.Sleep(10 * time.Second)
-				return errors.New("teste")
+				return errors.New("test")
 			},
 			1,
 			true).
@@ -37,7 +37,7 @@ func Example_Simple_Worker() {
 			"w3",
 			func() error {
 				time.Sleep(1 * time.Minute)
-				return errors.New("teste")
+				return errors.New("test")
 			},
 			1,
 			false).

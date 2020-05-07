@@ -12,8 +12,7 @@ func TestNewWorker(t *testing.T) {
 	nameWorker := "w1"
 	handleWorker := func() error { return nil }
 	concurrencyWorker := 1
-	restartAlwaysWorker := false
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
 	if w.Name != nameWorker {
 		t.Errorf("Name of worker if different from setup %s != %s", w.Name, nameWorker)
 	}
@@ -23,8 +22,8 @@ func TestNewWorker(t *testing.T) {
 	if w.Concurrency != concurrencyWorker {
 		t.Errorf("Concurrency of worker if different from setup %d != %d", w.Concurrency, concurrencyWorker)
 	}
-	if w.RestartAlways != restartAlwaysWorker {
-		t.Errorf("RestartAlaways of worker if different from setup %t != %t", w.RestartAlways, restartAlwaysWorker)
+	if w.RestartAlways != false {
+		t.Errorf("RestartAlaways of worker if different from setup %t != %t", w.RestartAlways, false)
 	}
 }
 
@@ -35,8 +34,7 @@ func TestWorker_Run(t *testing.T) {
 		return errors.New("happened error")
 	}
 	concurrencyWorker := 1
-	restartAlwaysWorker := false
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -66,7 +64,7 @@ func TestWorker_Status(t *testing.T) {
 	}
 	concurrencyWorker := 1
 	restartAlwaysWorker := false
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -128,12 +126,11 @@ func TestWorker_Healthy(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	restartAlwaysWorker := false
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
 	go func() {
-		errors := make(chan WrapperHandleError)
-		w.Run(errors)
-		close(errors)
+		errs := make(chan WrapperHandleError)
+		w.Run(errs)
+		close(errs)
 	}()
 	<-time.After(1 * time.Second)
 	if !w.Healthy() {

@@ -4,4 +4,3 @@ without any other dependency just Uuid. It allows you to expose an http server t
 Workers for consumer queues, channel processes and other things that you think worker needs.
 */
 package gwp
-
