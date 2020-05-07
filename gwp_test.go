@@ -1,7 +1,6 @@
 package gwp
 
 import (
-	"context"
 	"fmt"
 	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
@@ -140,7 +139,6 @@ func Test_server_Worker(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	context.TODO()
 	s := New().Worker(nameWorker, handleWorker, concurrencyWorker, false)
 	workers := s.Workers()
 	if len(workers) != 1 {
