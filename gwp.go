@@ -44,7 +44,7 @@ func NewWithConfig(configs map[string]interface{}) *WorkerServer {
 	s := &WorkerServer{
 		config:  configs,
 		workers: map[string]*worker.Worker{},
-		healthy: []func() bool {},
+		healthy: []func() bool{},
 	}
 	runtime.SetServerRun(s)
 	return s

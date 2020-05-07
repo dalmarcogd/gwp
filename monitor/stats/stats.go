@@ -2,7 +2,7 @@ package stats
 
 import (
 	"encoding/json"
-	gwpr "github.com/dalmarcogd/gwp/runtime"
+	run "github.com/dalmarcogd/gwp/runtime"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -21,7 +21,7 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 		"workers":    []map[string]interface{}{},
 	}
 
-	for _, worker := range gwpr.GetServerRun().Workers() {
+	for _, worker := range run.GetServerRun().Workers() {
 		finishedAt := ""
 		if !worker.FinishedAt.IsZero() {
 			finishedAt = worker.FinishedAt.Format(time.RFC3339)

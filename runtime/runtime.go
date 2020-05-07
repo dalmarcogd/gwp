@@ -27,6 +27,3 @@ func (f FakeServer) Workers() []*worker.Worker {
 func (f FakeServer) Healthy() bool {
 	return true
 }
-
-
-

@@ -1,6 +1,7 @@
 package gwp
 
 import (
+	"context"
 	"fmt"
 	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
@@ -139,8 +140,8 @@ func Test_server_Worker(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	restartAlwaysWorker := false
-	s := New().Worker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	context.TODO()
+	s := New().Worker(nameWorker, handleWorker, concurrencyWorker, false)
 	workers := s.Workers()
 	if len(workers) != 1 {
 		t.Error("Number of workers is different from setup")
@@ -155,8 +156,8 @@ func Test_server_Worker(t *testing.T) {
 	if w.Concurrency != concurrencyWorker {
 		t.Errorf("Concurrency of worker if different from setup %d != %d", w.Concurrency, concurrencyWorker)
 	}
-	if w.RestartAlways != restartAlwaysWorker {
-		t.Errorf("RestartAlaways of worker if different from setup %t != %t", w.RestartAlways, restartAlwaysWorker)
+	if w.RestartAlways != false {
+		t.Errorf("RestartAlaways of worker if different from setup %t != false", w.RestartAlways)
 	}
 	go func() {
 		if err := s.Run(); err != nil {
