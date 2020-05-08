@@ -203,4 +203,37 @@ func Test_runWorkerHandleError(t *testing.T) {
 	if !hasError {
 		t.Error("Expected error handled")
 	}
+
+	hasError = false
+	handleErrors = func(w *Worker, err error) {
+		log.Print(err)
+		<-time.After(11 * time.Second)
+		hasError = true
+	}
+
+	workers = []*Worker{
+		NewWorker("w2",
+			func() error {
+				<-time.After(1 * time.Second)
+				return errors.New("happened some error")
+			},
+			1,
+			false),
+	}
+
+	go func() {
+		if err := RunWorkers(workers, handleErrors); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(12 * time.Second)
+	for _, worker := range workers {
+		if worker.Status()["w2-1"] != ERROR {
+			t.Error("Worker setup to return error but not returned")
+		}
+	}
+	if hasError {
+		t.Error("Expected no error handled")
+	}
 }

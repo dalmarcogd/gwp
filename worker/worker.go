@@ -79,13 +79,17 @@ func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error
 	var wg sync.WaitGroup
 
 	for _, worker := range workers {
-		errors := make(chan WrapperHandleError)
+		errors := make(chan WrapperHandleError, worker.Concurrency)
 
-		wg.Add(1)
-		go runWorker(&wg)(worker, errors)
-
-		wg.Add(1)
-		go runWorkerHandleError(handleError)(worker, handleError, errors, &wg)
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+			runWorker(worker, errors)
+		}()
+		go func(w *Worker) {
+			defer wg.Done()
+			runWorkerHandleError(handleError, w, errors)
+		}(worker)
 	}
 	// Waiting all goroutines
 	wg.Wait()
@@ -93,33 +97,38 @@ func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error
 	return nil
 }
 
-func runWorker(wg *sync.WaitGroup) func(w *Worker, errors chan WrapperHandleError) {
-	return func(w *Worker, errors chan WrapperHandleError) {
-		defer wg.Done()
-		log.Printf("Worker [%s] started", w.Name)
-		defer log.Printf("Worker [%s] finished", w.Name)
-		defer close(errors)
-		for {
-			w.Run(errors)
-			if !w.RestartAlways {
-				w.FinishedAt = time.Now().UTC()
-				break
-			}
-			w.Restarts++
-			log.Printf("Worker [%s] restarted", w.Name)
+func runWorker(w *Worker, errors chan WrapperHandleError) {
+	log.Printf("Worker [%s] started", w.Name)
+	defer log.Printf("Worker [%s] finished", w.Name)
+	defer close(errors)
+	for {
+		w.Run(errors)
+		if !w.RestartAlways {
+			w.FinishedAt = time.Now().UTC()
+			break
 		}
+		w.Restarts++
+		log.Printf("Worker [%s] restarted", w.Name)
 	}
 }
 
-func runWorkerHandleError(handleError func(w *Worker, err error)) func(worker *Worker, handle func(w *Worker, err error), errors chan WrapperHandleError, wg *sync.WaitGroup) {
-	return func(worker *Worker, handle func(w *Worker, err error), errors chan WrapperHandleError, wg *sync.WaitGroup) {
-		defer wg.Done()
-		defer log.Printf("Worker [%s] handleError finished", worker.Name)
-		log.Printf("Worker [%s] handleError started", worker.Name)
-		for err := range errors {
-			if handleError != nil {
+func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker, errors chan WrapperHandleError) {
+	defer log.Printf("Worker [%s] handleError finished", worker.Name)
+	log.Printf("Worker [%s] handleError started", worker.Name)
+	for err := range errors {
+		done := make(chan bool)
+		if handleError != nil {
+			go func() {
 				handleError(err.worker, err.err)
-			}
+				done <- true
+			}()
+		}
+		select {
+		case <-time.After(10 * time.Second):
+			log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err)
+
+		case <-done:
+			continue
 		}
 	}
 }
