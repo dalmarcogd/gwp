@@ -87,6 +87,8 @@ func (s SubWorker) Name() string {
 	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }
 
+//Run method execute on instance fo worker. If you have config two concurrences
+//this will execute two twice
 func (s *SubWorker) Run(errors chan WrapperHandleError) chan bool {
 	done := make(chan bool, 1)
 
