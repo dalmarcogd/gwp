@@ -70,8 +70,8 @@ func (w *Worker) Status() map[string]string {
 	return status
 }
 
-// IsUp check if anyone #SubWorker still #STARTED,
-// this survey responds if it is running
+//Healthy check if anyone #SubWorker still #STARTED,
+//this survey responds if it is running
 func (w *Worker) Healthy() bool {
 	for _, v := range w.Status() {
 		if v == STARTED {
