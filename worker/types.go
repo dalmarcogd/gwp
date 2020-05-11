@@ -41,12 +41,13 @@ type (
 		ctx           context.Context
 	}
 
-	// WrapperHandleError is a wrapper to transport worker and the error generate inside worker
+	//WrapperHandleError is a wrapper to transport worker and the error generate inside worker
 	WrapperHandleError struct {
 		worker *Worker
 		err    error
 	}
 
+	//Config struct for config the worker
 	Config struct {
 		k func(w *Worker)
 	}
