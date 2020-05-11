@@ -12,7 +12,7 @@ func TestNewWorker(t *testing.T) {
 	nameWorker := "w1"
 	handleWorker := func() error { return nil }
 	concurrencyWorker := 1
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	if w.Name != nameWorker {
 		t.Errorf("Name of worker if different from setup %s != %s", w.Name, nameWorker)
 	}
@@ -34,7 +34,7 @@ func TestWorker_Run(t *testing.T) {
 		return errors.New("happened error")
 	}
 	concurrencyWorker := 1
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -63,8 +63,7 @@ func TestWorker_Status(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	restartAlwaysWorker := false
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -83,8 +82,7 @@ func TestWorker_Status(t *testing.T) {
 		return errors.New("happened error")
 	}
 	concurrencyWorker = 1
-	restartAlwaysWorker = false
-	w = NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w = NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -103,8 +101,7 @@ func TestWorker_Status(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker = 1
-	restartAlwaysWorker = false
-	w = NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w = NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -126,7 +123,7 @@ func TestWorker_Healthy(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errs := make(chan WrapperHandleError)
 		w.Run(errs)
@@ -153,8 +150,8 @@ func TestRunWorkers(t *testing.T) {
 				<-time.After(1 * time.Second)
 				return nil
 			},
-			1,
-			true),
+			WithRestartAlways(),
+		),
 	}
 
 	go func() {
@@ -183,9 +180,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 			func() error {
 				<-time.After(1 * time.Second)
 				return errors.New("happened some error")
-			},
-			1,
-			false),
+			}),
 	}
 
 	go func() {
@@ -216,9 +211,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 			func() error {
 				<-time.After(1 * time.Second)
 				return errors.New("happened some error")
-			},
-			1,
-			false),
+			}),
 	}
 
 	go func() {

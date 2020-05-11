@@ -93,8 +93,8 @@ func (s *WorkerServer) HandleError(handle func(w *worker.Worker, err error)) *Wo
 }
 
 // Worker build an #Worker and add to execution with #WorkerServer
-func (s *WorkerServer) Worker(name string, handle func() error, concurrency int, restartAlways bool) *WorkerServer {
-	w := worker.NewWorker(name, handle, concurrency, restartAlways)
+func (s *WorkerServer) Worker(name string, handle func() error, configs ...worker.Config) *WorkerServer {
+	w := worker.NewWorker(name, handle, configs...)
 	s.workers[w.ID] = w
 	return s.CheckHealth(func() bool {
 		return w.Healthy()

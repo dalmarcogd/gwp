@@ -23,24 +23,19 @@ func Example_Simple_Worker() {
 				time.Sleep(10 * time.Second)
 				return errors.New("test")
 			},
-			1,
-			true).
+			worker.WithRestartAlways()).
 		Worker(
 			"w2",
 			func() error {
 				time.Sleep(30 * time.Second)
 				return nil
-			},
-			1,
-			false).
+			}).
 		Worker(
 			"w3",
 			func() error {
 				time.Sleep(1 * time.Minute)
 				return errors.New("test")
-			},
-			1,
-			false).
+			}).
 		Run(); err != nil {
 		panic(err)
 	}

@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/uuid"
 	"log"
@@ -11,17 +12,20 @@ import (
 
 // NewWorker is a constructor for #Worker and give
 // for user some default settings
-func NewWorker(name string, handle func() error, concurrency int, restartAlways bool) *Worker {
+func NewWorker(name string, handle func() error, configs ...Config) *Worker {
 	id, _ := uuid.NewUUID()
-	return &Worker{
-		ID:            id.String(),
-		Name:          name,
-		Handle:        handle,
-		Concurrency:   concurrency,
-		RestartAlways: restartAlways,
-		subWorkers:    make(map[string]*SubWorker),
-		Restarts:      0,
+	w := &Worker{
+		ID:          id.String(),
+		Name:        name,
+		Handle:      handle,
+		Concurrency: 1,
+		subWorkers:  make(map[string]*SubWorker),
+		ctx:         context.Background(),
 	}
+	for _, config := range configs {
+		config.Apply(w)
+	}
+	return w
 }
 
 // Run is a executed inside goroutine by #RunWorkers
@@ -30,20 +34,29 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	w.StartAt = time.Now().UTC()
 	for i := 1; i <= w.Concurrency; i++ {
-		s := &SubWorker{ID: i, Status: STARTED, Worker: w}
+		ctx, cancel := context.WithCancel(w.ctx)
+		if w.Timeout > 0 {
+			ctx, cancel = context.WithTimeout(ctx, w.Timeout)
+		}
+		if !w.Deadline.IsZero() {
+			ctx, cancel = context.WithDeadline(ctx, w.Deadline)
+		}
+
+		s := &SubWorker{ID: i, Status: STARTED, Worker: w, ctx: ctx}
 		w.subWorkers[s.Name()] = s
 
 		wg.Add(1)
-		go func(handle func() error, sw *SubWorker) {
+		go func(subWorker *SubWorker, c context.Context, cancelFunc context.CancelFunc) {
 			defer wg.Done()
-			if err := handle(); err != nil {
-				errors <- WrapperHandleError{worker: w, err: err}
-				sw.Status = ERROR
-				sw.Error = err
-			} else {
-				sw.Status = FINISHED
+			defer cancelFunc()
+
+			select {
+			case <-c.Done():
+				log.Printf("Worker [%v] finished: %v", subWorker.Name(), ctx.Err())
+			case <-s.Run(errors):
+				log.Printf("Worker [%v] finished", subWorker.Name())
 			}
-		}(w.Handle, s)
+		}(s, ctx, cancel)
 	}
 	wg.Wait()
 }
@@ -72,6 +85,23 @@ func (w *Worker) Healthy() bool {
 // the pattern is %s-%s <- #Worker.Name, #SubWorker.ID
 func (s SubWorker) Name() string {
 	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
+}
+
+func (s *SubWorker) Run(errors chan WrapperHandleError) chan bool {
+	done := make(chan bool, 1)
+
+	go func(handle func() error, sw *SubWorker) {
+		if err := handle(); err != nil {
+			errors <- WrapperHandleError{worker: sw.Worker, err: err}
+			sw.Status = ERROR
+			sw.Error = err
+		} else {
+			sw.Status = FINISHED
+		}
+		done <- true
+	}(s.Worker.Handle, s)
+
+	return done
 }
 
 // RunWorkers is a function that administrate the workers and yours errors

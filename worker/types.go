@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type (
 		ID     int
 		Status string
 		Error  error
+		ctx    context.Context
 	}
 
 	// Worker is a type that represents an group of concurrency and keep some settings
@@ -33,12 +35,19 @@ type (
 		Concurrency   int
 		RestartAlways bool
 		Restarts      int
+		Timeout       time.Duration
+		Deadline      time.Time
 		subWorkers    map[string]*SubWorker
+		ctx           context.Context
 	}
 
 	// WrapperHandleError is a wrapper to transport worker and the error generate inside worker
 	WrapperHandleError struct {
 		worker *Worker
 		err    error
+	}
+
+	Config struct {
+		k func(w *Worker)
 	}
 )

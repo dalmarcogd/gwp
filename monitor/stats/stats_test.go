@@ -78,7 +78,7 @@ func (s STFakeServer) Healthy() bool {
 func (STFakeServer) Workers() []*worker.Worker {
 	w := worker.NewWorker("w1", func() error {
 		return nil
-	}, 1, false)
+	})
 	w.FinishedAt = time.Now().UTC()
 	return []*worker.Worker{
 		w,
