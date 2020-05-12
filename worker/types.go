@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	// STARTED is a value used for control which are running
-	STARTED = "Started"
-	// FINISHED is a value used for control which are finished
-	FINISHED = "Finished"
-	// ERROR is a value used for control if has error
-	ERROR = "Error"
+	// Started is a value used for control which are running
+	Started = "Started"
+	// Finished is a value used for control which are finished
+	Finished = "Finished"
+	// Error is a value used for control if has error
+	Error = "Error"
 )
 
 type (
@@ -43,8 +43,8 @@ type (
 
 	//WrapperHandleError is a wrapper to transport worker and the error generate inside worker
 	WrapperHandleError struct {
-		worker *Worker
-		err    error
+		subWorker *SubWorker
+		err       error
 	}
 
 	//Config struct for config the worker

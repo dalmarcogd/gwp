@@ -34,15 +34,9 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	w.StartAt = time.Now().UTC()
 	for i := 1; i <= w.Concurrency; i++ {
-		ctx, cancel := context.WithCancel(w.ctx)
-		if w.Timeout > 0 {
-			ctx, cancel = context.WithTimeout(ctx, w.Timeout)
-		}
-		if !w.Deadline.IsZero() {
-			ctx, cancel = context.WithDeadline(ctx, w.Deadline)
-		}
+		ctx, cancel := getContext(w)
 
-		s := &SubWorker{ID: i, Status: STARTED, Worker: w, ctx: ctx}
+		s := newSubWorker(i, w, ctx)
 		w.subWorkers[s.Name()] = s
 
 		wg.Add(1)
@@ -61,6 +55,21 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	wg.Wait()
 }
 
+func newSubWorker(id int, w *Worker, ctx context.Context) *SubWorker {
+	return &SubWorker{ID: id, Status: Started, Worker: w, ctx: ctx}
+}
+
+func getContext(w *Worker) (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithCancel(w.ctx)
+	if w.Timeout > 0 {
+		ctx, cancel = context.WithTimeout(ctx, w.Timeout)
+	}
+	if !w.Deadline.IsZero() {
+		ctx, cancel = context.WithDeadline(ctx, w.Deadline)
+	}
+	return ctx, cancel
+}
+
 // Status return a map with status from the each #SubWorker
 func (w *Worker) Status() map[string]string {
 	status := map[string]string{}
@@ -70,11 +79,11 @@ func (w *Worker) Status() map[string]string {
 	return status
 }
 
-//Healthy check if anyone #SubWorker still #STARTED,
+//Healthy check if anyone #SubWorker still #Started,
 //this survey responds if it is running
 func (w *Worker) Healthy() bool {
 	for _, v := range w.Status() {
-		if v == STARTED {
+		if v == Started {
 			return true
 		}
 	}
@@ -94,11 +103,11 @@ func (s *SubWorker) Run(errors chan WrapperHandleError) chan bool {
 
 	go func(handle func() error, sw *SubWorker) {
 		if err := handle(); err != nil {
-			errors <- WrapperHandleError{worker: sw.Worker, err: err}
-			sw.Status = ERROR
+			errors <- WrapperHandleError{subWorker: sw, err: err}
+			sw.Status = Error
 			sw.Error = err
 		} else {
-			sw.Status = FINISHED
+			sw.Status = Finished
 		}
 		done <- true
 	}(s.Worker.Handle, s)
@@ -151,7 +160,7 @@ func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker
 		done := make(chan bool)
 		if handleError != nil {
 			go func() {
-				handleError(err.worker, err.err)
+				handleError(err.subWorker.Worker, err.err)
 				done <- true
 			}()
 		}
