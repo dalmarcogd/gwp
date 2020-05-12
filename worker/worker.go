@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// NewWorker is a constructor for #Worker and give
-// for user some default settings
+//NewWorker is a constructor for #Worker and give
+//for user some default settings
 func NewWorker(name string, handle func() error, configs ...Config) *Worker {
 	id, _ := uuid.NewUUID()
 	w := &Worker{
@@ -28,8 +28,8 @@ func NewWorker(name string, handle func() error, configs ...Config) *Worker {
 	return w
 }
 
-// Run is a executed inside goroutine by #RunWorkers
-// He administrate the number of concurrency
+//Run is a executed inside goroutine by #RunWorkers
+//He administrate the number of concurrency
 func (w *Worker) Run(errors chan WrapperHandleError) {
 	var wg sync.WaitGroup
 	w.StartAt = time.Now().UTC()
@@ -70,7 +70,7 @@ func getContext(w *Worker) (context.Context, context.CancelFunc) {
 	return ctx, cancel
 }
 
-// Status return a map with status from the each #SubWorker
+//Status return a map with status from the each #SubWorker
 func (w *Worker) Status() map[string]string {
 	status := map[string]string{}
 	for _, subWorker := range w.subWorkers {
@@ -90,8 +90,8 @@ func (w *Worker) Healthy() bool {
 	return false
 }
 
-// Name return the name of #SubWorker
-// the pattern is %s-%s <- #Worker.Name, #SubWorker.ID
+//Name return the name of #SubWorker
+//the pattern is %s-%s <- #Worker.Name, #SubWorker.ID
 func (s SubWorker) Name() string {
 	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }
@@ -132,7 +132,7 @@ func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error
 			runWorkerHandleError(handleError, w, errors)
 		}(worker)
 	}
-	// Waiting all goroutines
+	//Waiting all goroutines
 	wg.Wait()
 
 	return nil
