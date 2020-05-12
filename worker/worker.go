@@ -157,19 +157,24 @@ func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker
 	defer log.Printf("Worker [%s] handleError finished", worker.Name)
 	log.Printf("Worker [%s] handleError started", worker.Name)
 	for err := range errors {
-		done := make(chan bool)
 		if handleError != nil {
+			done := make(chan bool, 1)
 			go func() {
 				handleError(err.subWorker.Worker, err.err)
 				done <- true
 			}()
-		}
-		select {
-		case <-time.After(10 * time.Second):
-			log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err)
-
-		case <-done:
-			continue
+			for {
+				select {
+				case <-time.After(10 * time.Second):
+					log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err.err)
+					break
+				case <-done:
+					log.Printf("Worker [%s] handleError handled: %v", worker.Name, err.err)
+					break
+				}
+			}
+		} else {
+			log.Printf("Worker [%s] error [%v] ignored", worker.Name, err.err)
 		}
 	}
 }

@@ -250,7 +250,7 @@ import (
 
 func main() {
 
-	ch := make(chan bool)
+	ch := make(chan bool, 1)
 
 	if err := gwp.
 		New().

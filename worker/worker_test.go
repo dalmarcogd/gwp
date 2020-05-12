@@ -125,7 +125,7 @@ func TestWorker_Healthy(t *testing.T) {
 	concurrencyWorker := 1
 	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
-		errs := make(chan WrapperHandleError)
+		errs := make(chan WrapperHandleError, w.Concurrency)
 		w.Run(errs)
 		close(errs)
 	}()
@@ -171,16 +171,16 @@ func TestRunWorkers(t *testing.T) {
 }
 
 func Test_runWorkerHandleError(t *testing.T) {
-	hasError := false
+	hasErrorHandled := false
 	handleErrors := func(w *Worker, err error) {
 		log.Print(err)
-		hasError = true
+		hasErrorHandled = true
 	}
 
 	workers := []*Worker{
 		NewWorker("w1",
 			func() error {
-				<-time.After(1 * time.Second)
+				<-time.After(2 * time.Second)
 				return errors.New("happened some error")
 			}),
 	}
@@ -197,21 +197,19 @@ func Test_runWorkerHandleError(t *testing.T) {
 			t.Error("Worker setup to return error but not returned")
 		}
 	}
-	if !hasError {
+	if !hasErrorHandled {
 		t.Error("Expected error handled")
 	}
 
-	hasError = false
+	hasErrorUnhandled := false
 	handleErrors = func(w *Worker, err error) {
-		log.Print(err)
 		<-time.After(11 * time.Second)
-		hasError = true
+		hasErrorUnhandled = true
 	}
 
 	workers = []*Worker{
 		NewWorker("w2",
 			func() error {
-				<-time.After(1 * time.Second)
 				return errors.New("happened some error")
 			}),
 	}
@@ -222,13 +220,33 @@ func Test_runWorkerHandleError(t *testing.T) {
 		}
 	}()
 
-	<-time.After(12 * time.Second)
+	<-time.After(10 * time.Second)
 	for _, worker := range workers {
 		if worker.Status()["w2-1"] != Error {
 			t.Error("Worker setup to return error but not returned")
 		}
 	}
-	if hasError {
+	if hasErrorUnhandled {
 		t.Error("Expected no error handled")
+	}
+
+	workers = []*Worker{
+		NewWorker("w3",
+			func() error {
+				return errors.New("happened some error")
+			}),
+	}
+
+	go func() {
+		if err := RunWorkers(workers, nil); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(1 * time.Second)
+	for _, worker := range workers {
+		if worker.Status()["w3-1"] != Error {
+			t.Error("Worker setup to return error but not returned")
+		}
 	}
 }
