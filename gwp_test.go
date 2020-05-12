@@ -201,6 +201,13 @@ func TestWorkerServer_Healthy(t *testing.T) {
 	}
 }
 
+
+func TestWorkerServer_Infos(t *testing.T) {
+	if infos := New().Infos(); infos == nil {
+		t.Error("Infos expected is but returned nil")
+	}
+}
+
 func TestWorkerServer_RunFullFeatures(t *testing.T) {
 	err := New().Worker("test",
 		func() error {

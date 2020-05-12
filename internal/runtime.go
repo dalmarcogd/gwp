@@ -1,6 +1,8 @@
-package runtime
+package internal
 
-import "github.com/dalmarcogd/gwp/worker"
+import (
+	"github.com/dalmarcogd/gwp/worker"
+)
 
 var currentServer Server
 
@@ -26,4 +28,9 @@ func (f FakeServer) Workers() []*worker.Worker {
 //Healthy return the health of server
 func (f FakeServer) Healthy() bool {
 	return true
+}
+
+//Infos return the empty infos
+func (f FakeServer) Infos() map[string]interface{} {
+	return ParseServerInfos(f)
 }

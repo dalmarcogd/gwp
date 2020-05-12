@@ -2,7 +2,7 @@ package healthcheck
 
 import (
 	"encoding/json"
-	"github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/internal"
 	"net/http"
 )
 
@@ -15,6 +15,6 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 
 	writer.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(writer).Encode(map[string]interface{}{
-		"status": runtime.GetServerRun().Healthy(),
+		"status": internal.GetServerRun().Healthy(),
 	})
 }

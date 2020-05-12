@@ -2,7 +2,7 @@ package healthcheck
 
 import (
 	"encoding/json"
-	"github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/internal"
 	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"net/http/httptest"
@@ -37,7 +37,7 @@ func TestHandler(t *testing.T) {
 		t.Errorf("Was expected the status true but returned %t", body["status"].(bool))
 	}
 
-	runtime.SetServerRun(HCFakeServer{})
+	internal.SetServerRun(HCFakeServer{})
 
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
@@ -70,6 +70,10 @@ func TestHandler(t *testing.T) {
 }
 
 type HCFakeServer struct{}
+
+func (s HCFakeServer) Infos() map[string]interface{} {
+	return internal.ParseServerInfos(s)
+}
 
 func (s HCFakeServer) Healthy() bool {
 	return true

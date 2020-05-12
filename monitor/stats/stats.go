@@ -2,11 +2,8 @@ package stats
 
 import (
 	"encoding/json"
-	run "github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/internal"
 	"net/http"
-	"runtime"
-	"strconv"
-	"time"
 )
 
 //Handler that return the stats from workerServer
@@ -15,29 +12,6 @@ func Handler(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	response := map[string]interface{}{
-		"cpus":       strconv.Itoa(runtime.NumCPU()),
-		"goroutines": strconv.Itoa(runtime.NumGoroutine()),
-		"workers":    []map[string]interface{}{},
-	}
-
-	for _, worker := range run.GetServerRun().Workers() {
-		finishedAt := ""
-		if !worker.FinishedAt.IsZero() {
-			finishedAt = worker.FinishedAt.Format(time.RFC3339)
-		}
-		response["workers"] = append(response["workers"].([]map[string]interface{}), map[string]interface{}{
-			"id":             worker.ID,
-			"name":           worker.Name,
-			"concurrency":    worker.Concurrency,
-			"restart_always": worker.RestartAlways,
-			"restarts":       worker.Restarts,
-			"started_at":     worker.StartAt.Format(time.RFC3339),
-			"finished_at":    finishedAt,
-			"status":         worker.Status(),
-		})
-	}
-
-	_ = json.NewEncoder(writer).Encode(response)
+	_ = json.NewEncoder(writer).Encode(internal.GetServerRun().Infos())
 	writer.Header().Set("Content-Type", "application/json")
 }

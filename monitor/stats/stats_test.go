@@ -2,7 +2,7 @@ package stats
 
 import (
 	"encoding/json"
-	"github.com/dalmarcogd/gwp/runtime"
+	"github.com/dalmarcogd/gwp/internal"
 	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +11,7 @@ import (
 )
 
 func TestHandler(t *testing.T) {
+
 	req, err := http.NewRequest(http.MethodGet, "/stats", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -37,7 +38,7 @@ func TestHandler(t *testing.T) {
 		t.Errorf("Was expected any one worker but returned %d", len(body["workers"].([]interface{})))
 	}
 
-	runtime.SetServerRun(STFakeServer{})
+	internal.SetServerRun(STFakeServer{})
 
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
@@ -70,6 +71,10 @@ func TestHandler(t *testing.T) {
 }
 
 type STFakeServer struct{}
+
+func (s STFakeServer) Infos() map[string]interface{} {
+	return internal.ParseServerInfos(s)
+}
 
 func (s STFakeServer) Healthy() bool {
 	return true

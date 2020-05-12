@@ -1,8 +1,8 @@
 package gwp
 
 import (
+	"github.com/dalmarcogd/gwp/internal"
 	"github.com/dalmarcogd/gwp/monitor"
-	"github.com/dalmarcogd/gwp/runtime"
 	"github.com/dalmarcogd/gwp/worker"
 	"log"
 	"net/http"
@@ -46,7 +46,7 @@ func NewWithConfig(configs map[string]interface{}) *WorkerServer {
 		workers: map[string]*worker.Worker{},
 		healthy: []func() bool{},
 	}
-	runtime.SetServerRun(s)
+	internal.SetServerRun(s)
 	return s
 }
 
@@ -120,6 +120,11 @@ func (s *WorkerServer) Healthy() bool {
 		}
 	}
 	return status
+}
+
+//Healthy return true or false if the WorkerServer its ok or no, respectively
+func (s *WorkerServer) Infos() map[string]interface{} {
+	return internal.ParseServerInfos(s)
 }
 
 // Configs return the configs from #WorkerServer

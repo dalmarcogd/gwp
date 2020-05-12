@@ -1,4 +1,4 @@
-package runtime
+package internal
 
 import (
 	"testing"
@@ -29,5 +29,12 @@ func TestFakeServer_Healthy(t *testing.T) {
 	var f FakeServer
 	if !f.Healthy() {
 		t.Error("FakeServer should return true healthy, but returned false")
+	}
+}
+
+func TestFakeServer_Infos(t *testing.T) {
+	var f FakeServer
+	if infos := f.Infos(); infos == nil {
+		t.Error("FakeServer should return non nil infos, but returned nil")
 	}
 }
