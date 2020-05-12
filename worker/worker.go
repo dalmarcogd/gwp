@@ -115,7 +115,7 @@ func (s *SubWorker) Run(errors chan WrapperHandleError) chan bool {
 	return done
 }
 
-// RunWorkers is a function that administrate the workers and yours errors
+//RunWorkers is a function that administrate the workers and yours errors
 func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error {
 	var wg sync.WaitGroup
 
