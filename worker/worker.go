@@ -123,10 +123,10 @@ func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error
 		errors := make(chan WrapperHandleError, worker.Concurrency)
 
 		wg.Add(2)
-		go func() {
+		go func(w *Worker) {
 			defer wg.Done()
-			runWorker(worker, errors)
-		}()
+			runWorker(w, errors)
+		}(worker)
 		go func(w *Worker) {
 			defer wg.Done()
 			runWorkerHandleError(handleError, w, errors)
@@ -159,10 +159,10 @@ func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker
 	for err := range errors {
 		if handleError != nil {
 			done := make(chan bool, 1)
-			go func() {
-				handleError(err.subWorker.Worker, err.err)
+			go func(e WrapperHandleError) {
+				handleError(e.subWorker.Worker, e.err)
 				done <- true
-			}()
+			}(err)
 
 			select {
 			case <-time.After(10 * time.Second):
