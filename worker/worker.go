@@ -163,15 +163,14 @@ func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker
 				handleError(err.subWorker.Worker, err.err)
 				done <- true
 			}()
-			for {
-				select {
-				case <-time.After(10 * time.Second):
-					log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err.err)
-					break
-				case <-done:
-					log.Printf("Worker [%s] handleError handled: %v", worker.Name, err.err)
-					break
-				}
+
+			select {
+			case <-time.After(10 * time.Second):
+				log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err.err)
+				break
+			case <-done:
+				log.Printf("Worker [%s] handleError handled: %v", worker.Name, err.err)
+				break
 			}
 		} else {
 			log.Printf("Worker [%s] error [%v] ignored", worker.Name, err.err)
