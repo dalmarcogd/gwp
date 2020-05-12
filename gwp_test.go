@@ -116,11 +116,11 @@ func Test_server_DebugPprof(t *testing.T) {
 }
 
 func Test_server_Run(t *testing.T) {
-	s := New().Worker("w1", func() error { return nil }, 1, false)
+	s := New().Worker("w1", func() error { return nil })
 	if err := s.Run(); err != nil {
 		t.Errorf("Error when run WorkerServer %v", err)
 	}
-	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func() error { return nil }, 1, false)
+	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func() error { return nil })
 	if err := s.Run(); err != nil {
 		t.Errorf("Error when run WorkerServer %v", err)
 	}
@@ -139,7 +139,7 @@ func Test_server_Worker(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	s := New().Worker(nameWorker, handleWorker, concurrencyWorker, false)
+	s := New().Worker(nameWorker, handleWorker)
 	workers := s.Workers()
 	if len(workers) != 1 {
 		t.Error("Number of workers is different from setup")
@@ -198,5 +198,26 @@ func TestWorkerServer_Healthy(t *testing.T) {
 	s = New()
 	if !s.Healthy() {
 		t.Error("Healthy expected is true but returned false")
+	}
+}
+
+
+func TestWorkerServer_Infos(t *testing.T) {
+	if infos := New().Infos(); infos == nil {
+		t.Error("Infos expected is but returned nil")
+	}
+}
+
+func TestWorkerServer_RunFullFeatures(t *testing.T) {
+	err := New().Worker("test",
+		func() error {
+			<-time.After(3 * time.Second)
+			return nil
+		},
+		worker.WithTimeout(2*time.Second),
+		worker.WithDeadline(time.Now().Add(4*time.Second)),
+		worker.WithConcurrency(2)).Run()
+	if err != nil {
+		t.Error(err)
 	}
 }

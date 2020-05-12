@@ -102,7 +102,7 @@ import (
 func main() {
 
 	params := &sqs.CreateQueueInput{
-		QueueName: aws.String("test-consume-sqs"), // Required
+		QueueName: aws.String("test-consume-sqs"), //Required
 	}
 	ss, _ := session.NewSession(&aws.Config{Endpoint: aws.String("http://localhost:9324"), Region: aws.String("us-east-1")})
 	svc := sqs.New(ss)
@@ -119,8 +119,8 @@ func main() {
 
 	for i := range []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10} {
 		paramsSend := &sqs.SendMessageInput{
-			MessageBody: aws.String("Testing " + strconv.Itoa(i)),                   // Required
-			QueueUrl:    queueURL, // Required
+			MessageBody: aws.String("Testing " + strconv.Itoa(i)),                   //Required
+			QueueUrl:    queueURL, //Required
 		}
 		respSend, err := svc.SendMessage(paramsSend)
 		if err != nil {
@@ -140,7 +140,7 @@ func main() {
 		}).
 		Worker("w2", func() error {
 			params := &sqs.ReceiveMessageInput{
-				QueueUrl:            queueURL, // Required
+				QueueUrl:            queueURL, //Required
 				MaxNumberOfMessages: aws.Int64(10),
 				VisibilityTimeout:   aws.Int64(20),
 			}
@@ -192,12 +192,12 @@ func main() {
 	defer channel.Close()
 
 	queue, err := channel.QueueDeclare(
-		"test-consume", // name
-		true,           // durable
-		false,          // delete when unused
-		false,          // exclusive
-		false,          // no-wait
-		nil,            // arguments
+		"test-consume", //name
+		true,           //durable
+		false,          //delete when unused
+		false,          //exclusive
+		false,          //no-wait
+		nil,            //arguments
 	)
 	failOnError(err, "Error when declare a queue")
 
@@ -250,7 +250,7 @@ import (
 
 func main() {
 
-	ch := make(chan bool)
+	ch := make(chan bool, 1)
 
 	if err := gwp.
 		New().

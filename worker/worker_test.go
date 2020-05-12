@@ -12,7 +12,7 @@ func TestNewWorker(t *testing.T) {
 	nameWorker := "w1"
 	handleWorker := func() error { return nil }
 	concurrencyWorker := 1
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	if w.Name != nameWorker {
 		t.Errorf("Name of worker if different from setup %s != %s", w.Name, nameWorker)
 	}
@@ -34,7 +34,7 @@ func TestWorker_Run(t *testing.T) {
 		return errors.New("happened error")
 	}
 	concurrencyWorker := 1
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -42,14 +42,14 @@ func TestWorker_Run(t *testing.T) {
 	}()
 
 	for _, v := range w.Status() {
-		if v != STARTED {
+		if v != Started {
 			t.Errorf("Was expect that worker is with started status, but returned: %s", v)
 		}
 	}
 
 	<-time.After(2 * time.Second)
 	for _, v := range w.Status() {
-		if v != ERROR {
+		if v != Error {
 			t.Errorf("Was expect that worker is with error status, but returned: %s", v)
 		}
 	}
@@ -63,8 +63,7 @@ func TestWorker_Status(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	restartAlwaysWorker := false
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -73,7 +72,7 @@ func TestWorker_Status(t *testing.T) {
 
 	<-time.After(1 * time.Second)
 	for _, v := range w.Status() {
-		if v != STARTED {
+		if v != Started {
 			t.Errorf("Was expect that worker is with started status, but returned: %s", v)
 		}
 	}
@@ -83,8 +82,7 @@ func TestWorker_Status(t *testing.T) {
 		return errors.New("happened error")
 	}
 	concurrencyWorker = 1
-	restartAlwaysWorker = false
-	w = NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w = NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -93,7 +91,7 @@ func TestWorker_Status(t *testing.T) {
 
 	<-time.After(1 * time.Second)
 	for _, v := range w.Status() {
-		if v != ERROR {
+		if v != Error {
 			t.Errorf("Was expect that worker is with error status, but returned: %s", v)
 		}
 	}
@@ -103,8 +101,7 @@ func TestWorker_Status(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker = 1
-	restartAlwaysWorker = false
-	w = NewWorker(nameWorker, handleWorker, concurrencyWorker, restartAlwaysWorker)
+	w = NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
 		errorsCh := make(chan WrapperHandleError, 1)
 		w.Run(errorsCh)
@@ -113,7 +110,7 @@ func TestWorker_Status(t *testing.T) {
 
 	<-time.After(1 * time.Second)
 	for _, v := range w.Status() {
-		if v != FINISHED {
+		if v != Finished {
 			t.Errorf("Was expect that worker is with finished status, but returned: %s", v)
 		}
 	}
@@ -126,9 +123,9 @@ func TestWorker_Healthy(t *testing.T) {
 		return nil
 	}
 	concurrencyWorker := 1
-	w := NewWorker(nameWorker, handleWorker, concurrencyWorker, false)
+	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	go func() {
-		errs := make(chan WrapperHandleError)
+		errs := make(chan WrapperHandleError, w.Concurrency)
 		w.Run(errs)
 		close(errs)
 	}()
@@ -150,11 +147,13 @@ func TestRunWorkers(t *testing.T) {
 	workers := []*Worker{
 		NewWorker("w1",
 			func() error {
-				<-time.After(1 * time.Second)
+				<-time.After((2 * time.Second) + 1)
 				return nil
 			},
-			1,
-			true),
+			WithRestartAlways(),
+			WithTimeout(1*time.Second),
+			WithDeadline(time.Now().Add(3*time.Second)),
+		),
 	}
 
 	go func() {
@@ -172,20 +171,18 @@ func TestRunWorkers(t *testing.T) {
 }
 
 func Test_runWorkerHandleError(t *testing.T) {
-	hasError := false
+	hasErrorHandled := false
 	handleErrors := func(w *Worker, err error) {
 		log.Print(err)
-		hasError = true
+		hasErrorHandled = true
 	}
 
 	workers := []*Worker{
 		NewWorker("w1",
 			func() error {
-				<-time.After(1 * time.Second)
+				<-time.After(2 * time.Second)
 				return errors.New("happened some error")
-			},
-			1,
-			false),
+			}),
 	}
 
 	go func() {
@@ -196,11 +193,60 @@ func Test_runWorkerHandleError(t *testing.T) {
 
 	<-time.After(3 * time.Second)
 	for _, worker := range workers {
-		if worker.Status()["w1-1"] != ERROR {
+		if worker.Status()["w1-1"] != Error {
 			t.Error("Worker setup to return error but not returned")
 		}
 	}
-	if !hasError {
+	if !hasErrorHandled {
 		t.Error("Expected error handled")
+	}
+
+	hasErrorUnhandled := false
+	handleErrors = func(w *Worker, err error) {
+		<-time.After(11 * time.Second)
+		hasErrorUnhandled = true
+	}
+
+	workers = []*Worker{
+		NewWorker("w2",
+			func() error {
+				return errors.New("happened some error")
+			}),
+	}
+
+	go func() {
+		if err := RunWorkers(workers, handleErrors); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(10 * time.Second)
+	for _, worker := range workers {
+		if worker.Status()["w2-1"] != Error {
+			t.Error("Worker setup to return error but not returned")
+		}
+	}
+	if hasErrorUnhandled {
+		t.Error("Expected no error handled")
+	}
+
+	workers = []*Worker{
+		NewWorker("w3",
+			func() error {
+				return errors.New("happened some error")
+			}),
+	}
+
+	go func() {
+		if err := RunWorkers(workers, nil); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(1 * time.Second)
+	for _, worker := range workers {
+		if worker.Status()["w3-1"] != Error {
+			t.Error("Worker setup to return error but not returned")
+		}
 	}
 }
