@@ -151,6 +151,7 @@ func TestRunWorkers(t *testing.T) {
 				return nil
 			},
 			WithRestartAlways(),
+			WithTimeout(50*time.Millisecond),
 		),
 	}
 
