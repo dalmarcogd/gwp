@@ -55,7 +55,7 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	wg.Wait()
 }
 
-func newSubWorker(id int, w *Worker, ctx context.Context) *SubWorker {
+func newSubWorker(ctx context.Context, id int, w *Worker) *SubWorker {
 	return &SubWorker{ID: id, Status: Started, Worker: w, ctx: ctx}
 }
 
