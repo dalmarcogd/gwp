@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+//ParseServerInfos format the infos about Server at map,
+//used for return data at /stats
 func ParseServerInfos(s Server) map[string]interface{} {
 	infos := map[string]interface{}{
 		"cpus":       strconv.Itoa(runtime.NumCPU()),
