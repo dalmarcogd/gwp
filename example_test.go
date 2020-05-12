@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func Example_Simple_Worker() {
+func Example_SimpleWorker() {
 	if err := gwp.
 		New().
 		Stats().
