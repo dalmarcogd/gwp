@@ -123,10 +123,10 @@ func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error
 		errors := make(chan WrapperHandleError, worker.Concurrency)
 
 		wg.Add(2)
-		go func() {
+		go func(w *Worker) {
 			defer wg.Done()
-			runWorker(worker, errors)
-		}()
+			runWorker(w, errors)
+		}(worker)
 		go func(w *Worker) {
 			defer wg.Done()
 			runWorkerHandleError(handleError, w, errors)
