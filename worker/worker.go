@@ -159,10 +159,10 @@ func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker
 	for err := range errors {
 		if handleError != nil {
 			done := make(chan bool, 1)
-			go func() {
-				handleError(err.subWorker.Worker, err.err)
+			go func(e WrapperHandleError) {
+				handleError(e.subWorker.Worker, e.err)
 				done <- true
-			}()
+			}(err)
 
 			select {
 			case <-time.After(10 * time.Second):
