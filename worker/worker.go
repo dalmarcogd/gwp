@@ -36,7 +36,7 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	for i := 1; i <= w.Concurrency; i++ {
 		ctx, cancel := getContext(w)
 
-		s := newSubWorker(i, w, ctx)
+		s := newSubWorker(ctx, i, w)
 		w.subWorkers[s.Name()] = s
 
 		wg.Add(1)
