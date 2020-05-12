@@ -147,11 +147,12 @@ func TestRunWorkers(t *testing.T) {
 	workers := []*Worker{
 		NewWorker("w1",
 			func() error {
-				<-time.After(1 * time.Second)
+				<-time.After((2 * time.Second) + 1)
 				return nil
 			},
 			WithRestartAlways(),
-			WithTimeout(50*time.Millisecond),
+			WithTimeout(1*time.Second),
+			WithDeadline(time.Now().Add(3*time.Second)),
 		),
 	}
 
