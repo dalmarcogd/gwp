@@ -31,7 +31,7 @@ type (
 		Name          string
 		StartAt       time.Time
 		FinishedAt    time.Time
-		Handle        func() error
+		Handle        func(ctx context.Context) error
 		Concurrency   int
 		RestartAlways bool
 		Restarts      int
