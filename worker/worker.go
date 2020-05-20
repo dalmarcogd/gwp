@@ -44,11 +44,17 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 			defer wg.Done()
 			defer cancelFunc()
 
+			if subWorker.Worker.Cron > 0 {
+				w.RestartAlways = true
+				<-time.Tick(subWorker.Worker.Cron)
+			}
+
 			select {
 			case <-c.Done():
 				log.Printf("Worker [%v] finished: %v", subWorker.Name(), ctx.Err())
 			case <-s.Run(errors):
 				log.Printf("Worker [%v] finished", subWorker.Name())
+				cancelFunc()
 			}
 		}(s, ctx, cancel)
 	}

@@ -20,6 +20,10 @@ func ParseServerInfos(s Server) map[string]interface{} {
 		if !w.FinishedAt.IsZero() {
 			finishedAt = w.FinishedAt.Format(time.RFC3339)
 		}
+		deadline := ""
+		if !w.Deadline.IsZero() {
+			deadline = w.Deadline.Format(time.RFC3339)
+		}
 		infos["workers"] = append(infos["workers"].([]map[string]interface{}), map[string]interface{}{
 			"id":             w.ID,
 			"name":           w.Name,
@@ -28,6 +32,9 @@ func ParseServerInfos(s Server) map[string]interface{} {
 			"restarts":       w.Restarts,
 			"started_at":     w.StartAt.Format(time.RFC3339),
 			"finished_at":    finishedAt,
+			"deadline":       deadline,
+			"timeout":        w.Timeout,
+			"cron":           w.Cron,
 			"status":         w.Status(),
 		})
 	}

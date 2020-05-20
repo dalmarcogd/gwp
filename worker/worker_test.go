@@ -148,12 +148,16 @@ func TestRunWorkers(t *testing.T) {
 	workers := []*Worker{
 		NewWorker("w1",
 			func(ctx context.Context) error {
-				<-time.After((2 * time.Second) + 1)
+				select {
+				case <-ctx.Done():
+				case <-time.After(1 * time.Second):
+				}
+
 				return nil
 			},
 			WithRestartAlways(),
-			WithTimeout(1*time.Second),
-			WithDeadline(time.Now().Add(3*time.Second)),
+			WithTimeout(3*time.Second),
+			WithDeadline(time.Now().Add(5*time.Second)),
 		),
 	}
 
@@ -168,6 +172,41 @@ func TestRunWorkers(t *testing.T) {
 		if worker.Restarts <= 0 {
 			t.Error("Worker setup to restart always but not restarted")
 		}
+	}
+}
+
+func TestRunWorkersCron(t *testing.T) {
+	handleErrors := func(w *Worker, err error) {
+		log.Print(err)
+	}
+
+	counter := 0
+	workers := []*Worker{
+		NewWorker("w1",
+			func(ctx context.Context) error {
+				select {
+				case <-ctx.Done():
+				default:
+					counter++
+					break
+				}
+
+				return nil
+			},
+			WithCron(time.Second),
+			WithTimeout(2*time.Second),
+		),
+	}
+
+	go func() {
+		if err := RunWorkers(workers, handleErrors); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(4 * time.Second)
+	if counter < 3 {
+		t.Error("Worker setup to execute every second by cron but not executed")
 	}
 }
 

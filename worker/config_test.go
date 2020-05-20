@@ -52,6 +52,18 @@ func TestWithTimeout(t *testing.T) {
 	}
 }
 
+func TestWithCron(t *testing.T) {
+	w := NewWorker("test", func(ctx context.Context) error {
+		return nil
+	})
+	duration := 2 * time.Second
+	cron := WithCron(duration)
+	cron.Apply(w)
+	if w.Cron != duration {
+		t.Errorf("Expected %v deadline but received %v", duration, w.Cron)
+	}
+}
+
 func Test_workerConfig_Apply(t *testing.T) {
 	config := Config{}
 	config.Apply(nil)

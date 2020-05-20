@@ -36,6 +36,7 @@ type (
 		RestartAlways bool
 		Restarts      int
 		Timeout       time.Duration
+		Cron          time.Duration
 		Deadline      time.Time
 		subWorkers    map[string]*SubWorker
 		ctx           context.Context
