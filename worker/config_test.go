@@ -1,12 +1,13 @@
 package worker
 
 import (
+	"context"
 	"testing"
 	"time"
 )
 
 func TestWithConcurrency(t *testing.T) {
-	w := NewWorker("test", func() error {
+	w := NewWorker("test", func(ctx context.Context) error {
 		return nil
 	})
 	concurrency := WithConcurrency(2)
@@ -17,7 +18,7 @@ func TestWithConcurrency(t *testing.T) {
 }
 
 func TestWithDeadline(t *testing.T) {
-	w := NewWorker("test", func() error {
+	w := NewWorker("test", func(ctx context.Context) error {
 		return nil
 	})
 	now := time.Now().Add(2 * time.Second)
@@ -29,7 +30,7 @@ func TestWithDeadline(t *testing.T) {
 }
 
 func TestWithRestartAlways(t *testing.T) {
-	w := NewWorker("test", func() error {
+	w := NewWorker("test", func(ctx context.Context) error {
 		return nil
 	})
 	restartAlways := WithRestartAlways()
@@ -40,7 +41,7 @@ func TestWithRestartAlways(t *testing.T) {
 }
 
 func TestWithTimeout(t *testing.T) {
-	w := NewWorker("test", func() error {
+	w := NewWorker("test", func(ctx context.Context) error {
 		return nil
 	})
 	duration := 2 * time.Second
@@ -51,16 +52,28 @@ func TestWithTimeout(t *testing.T) {
 	}
 }
 
+func TestWithCron(t *testing.T) {
+	w := NewWorker("test", func(ctx context.Context) error {
+		return nil
+	})
+	duration := 2 * time.Second
+	cron := WithCron(duration)
+	cron.Apply(w)
+	if w.Cron != duration {
+		t.Errorf("Expected %v deadline but received %v", duration, w.Cron)
+	}
+}
+
 func Test_workerConfig_Apply(t *testing.T) {
 	config := Config{}
 	config.Apply(nil)
-	config.Apply(NewWorker("test", func() error {
+	config.Apply(NewWorker("test", func(ctx context.Context) error {
 		return nil
 	}))
 }
 
 func TestFullWith(t *testing.T) {
-	w := NewWorker("test", func() error {
+	w := NewWorker("test", func(ctx context.Context) error {
 		return nil
 	})
 

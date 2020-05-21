@@ -12,7 +12,7 @@ import (
 
 //NewWorker is a constructor for #Worker and give
 //for user some default settings
-func NewWorker(name string, handle func() error, configs ...Config) *Worker {
+func NewWorker(name string, handle func(ctx context.Context) error, configs ...Config) *Worker {
 	id, _ := uuid.NewUUID()
 	w := &Worker{
 		ID:          id.String(),
@@ -44,11 +44,17 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 			defer wg.Done()
 			defer cancelFunc()
 
+			if subWorker.Worker.Cron > 0 {
+				w.RestartAlways = true
+				<-time.Tick(subWorker.Worker.Cron)
+			}
+
 			select {
 			case <-c.Done():
 				log.Printf("Worker [%v] finished: %v", subWorker.Name(), ctx.Err())
 			case <-s.Run(errors):
 				log.Printf("Worker [%v] finished", subWorker.Name())
+				cancelFunc()
 			}
 		}(s, ctx, cancel)
 	}
@@ -101,8 +107,8 @@ func (s SubWorker) Name() string {
 func (s *SubWorker) Run(errors chan WrapperHandleError) chan bool {
 	done := make(chan bool, 1)
 
-	go func(handle func() error, sw *SubWorker) {
-		if err := handle(); err != nil {
+	go func(handle func(ctx context.Context) error, sw *SubWorker) {
+		if err := handle(s.ctx); err != nil {
 			errors <- WrapperHandleError{subWorker: sw, err: err}
 			sw.Status = Error
 			sw.Error = err

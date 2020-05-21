@@ -1,6 +1,7 @@
 package gwp
 
 import (
+	"context"
 	"github.com/dalmarcogd/gwp/internal"
 	"github.com/dalmarcogd/gwp/monitor"
 	"github.com/dalmarcogd/gwp/worker"
@@ -93,7 +94,7 @@ func (s *WorkerServer) HandleError(handle func(w *worker.Worker, err error)) *Wo
 }
 
 //Worker build an #Worker and add to execution with #WorkerServer
-func (s *WorkerServer) Worker(name string, handle func() error, configs ...worker.Config) *WorkerServer {
+func (s *WorkerServer) Worker(name string, handle func(ctx context.Context) error, configs ...worker.Config) *WorkerServer {
 	w := worker.NewWorker(name, handle, configs...)
 	s.workers[w.ID] = w
 	return s.CheckHealth(func() bool {

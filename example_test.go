@@ -1,6 +1,7 @@
 package gwp_test
 
 import (
+	"context"
 	"errors"
 	"github.com/dalmarcogd/gwp"
 	"github.com/dalmarcogd/gwp/worker"
@@ -19,20 +20,20 @@ func Example_SimpleWorker() {
 		}).
 		Worker(
 			"w1",
-			func() error {
+			func(ctx context.Context) error {
 				time.Sleep(10 * time.Second)
 				return errors.New("test")
 			},
 			worker.WithRestartAlways()).
 		Worker(
 			"w2",
-			func() error {
+			func(ctx context.Context) error {
 				time.Sleep(30 * time.Second)
 				return nil
 			}).
 		Worker(
 			"w3",
-			func() error {
+			func(ctx context.Context) error {
 				time.Sleep(1 * time.Minute)
 				return errors.New("test")
 			}).

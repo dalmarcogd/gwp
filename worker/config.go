@@ -28,3 +28,8 @@ func WithTimeout(t time.Duration) Config {
 func WithDeadline(t time.Time) Config {
 	return Config{k: func(w *Worker) { w.Deadline = t }}
 }
+
+//WithCron generate a setup to worker with specify deadline
+func WithCron(t time.Duration) Config {
+	return Config{k: func(w *Worker) { w.Cron = t }}
+}

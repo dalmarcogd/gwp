@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -10,7 +11,7 @@ import (
 
 func TestNewWorker(t *testing.T) {
 	nameWorker := "w1"
-	handleWorker := func() error { return nil }
+	handleWorker := func(ctx context.Context) error { return nil }
 	concurrencyWorker := 1
 	w := NewWorker(nameWorker, handleWorker, WithConcurrency(concurrencyWorker))
 	if w.Name != nameWorker {
@@ -29,7 +30,7 @@ func TestNewWorker(t *testing.T) {
 
 func TestWorker_Run(t *testing.T) {
 	nameWorker := "w1"
-	handleWorker := func() error {
+	handleWorker := func(ctx context.Context) error {
 		<-time.After(1 * time.Second)
 		return errors.New("happened error")
 	}
@@ -58,7 +59,7 @@ func TestWorker_Run(t *testing.T) {
 
 func TestWorker_Status(t *testing.T) {
 	nameWorker := "w1"
-	handleWorker := func() error {
+	handleWorker := func(ctx context.Context) error {
 		<-time.After(3 * time.Second)
 		return nil
 	}
@@ -78,7 +79,7 @@ func TestWorker_Status(t *testing.T) {
 	}
 
 	nameWorker = "w1"
-	handleWorker = func() error {
+	handleWorker = func(ctx context.Context) error {
 		return errors.New("happened error")
 	}
 	concurrencyWorker = 1
@@ -97,7 +98,7 @@ func TestWorker_Status(t *testing.T) {
 	}
 
 	nameWorker = "w1"
-	handleWorker = func() error {
+	handleWorker = func(ctx context.Context) error {
 		return nil
 	}
 	concurrencyWorker = 1
@@ -118,7 +119,7 @@ func TestWorker_Status(t *testing.T) {
 
 func TestWorker_Healthy(t *testing.T) {
 	nameWorker := "w1"
-	handleWorker := func() error {
+	handleWorker := func(ctx context.Context) error {
 		<-time.After(3 * time.Second)
 		return nil
 	}
@@ -146,13 +147,17 @@ func TestRunWorkers(t *testing.T) {
 
 	workers := []*Worker{
 		NewWorker("w1",
-			func() error {
-				<-time.After((2 * time.Second) + 1)
+			func(ctx context.Context) error {
+				select {
+				case <-ctx.Done():
+				case <-time.After(1 * time.Second):
+				}
+
 				return nil
 			},
 			WithRestartAlways(),
-			WithTimeout(1*time.Second),
-			WithDeadline(time.Now().Add(3*time.Second)),
+			WithTimeout(3*time.Second),
+			WithDeadline(time.Now().Add(5*time.Second)),
 		),
 	}
 
@@ -170,6 +175,41 @@ func TestRunWorkers(t *testing.T) {
 	}
 }
 
+func TestRunWorkersCron(t *testing.T) {
+	handleErrors := func(w *Worker, err error) {
+		log.Print(err)
+	}
+
+	counter := 0
+	workers := []*Worker{
+		NewWorker("w1",
+			func(ctx context.Context) error {
+				select {
+				case <-ctx.Done():
+				default:
+					counter++
+					break
+				}
+
+				return nil
+			},
+			WithCron(time.Second),
+			WithTimeout(2*time.Second),
+		),
+	}
+
+	go func() {
+		if err := RunWorkers(workers, handleErrors); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(4 * time.Second)
+	if counter < 3 {
+		t.Error("Worker setup to execute every second by cron but not executed")
+	}
+}
+
 func Test_runWorkerHandleError(t *testing.T) {
 	hasErrorHandled := false
 	handleErrors := func(w *Worker, err error) {
@@ -179,7 +219,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 
 	workers := []*Worker{
 		NewWorker("w1",
-			func() error {
+			func(ctx context.Context) error {
 				<-time.After(2 * time.Second)
 				return errors.New("happened some error")
 			}),
@@ -209,7 +249,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 
 	workers = []*Worker{
 		NewWorker("w2",
-			func() error {
+			func(ctx context.Context) error {
 				return errors.New("happened some error")
 			}),
 	}
@@ -232,7 +272,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 
 	workers = []*Worker{
 		NewWorker("w3",
-			func() error {
+			func(ctx context.Context) error {
 				return errors.New("happened some error")
 			}),
 	}

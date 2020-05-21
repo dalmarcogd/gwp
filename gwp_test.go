@@ -1,6 +1,7 @@
 package gwp
 
 import (
+	"context"
 	"fmt"
 	"github.com/dalmarcogd/gwp/worker"
 	"net/http"
@@ -116,11 +117,11 @@ func Test_server_DebugPprof(t *testing.T) {
 }
 
 func Test_server_Run(t *testing.T) {
-	s := New().Worker("w1", func() error { return nil })
+	s := New().Worker("w1", func(ctx context.Context) error { return nil })
 	if err := s.Run(); err != nil {
 		t.Errorf("Error when run WorkerServer %v", err)
 	}
-	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func() error { return nil })
+	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func(ctx context.Context) error { return nil })
 	if err := s.Run(); err != nil {
 		t.Errorf("Error when run WorkerServer %v", err)
 	}
@@ -134,7 +135,7 @@ func Test_server_Run_Error(t *testing.T) {
 
 func Test_server_Worker(t *testing.T) {
 	nameWorker := "w1"
-	handleWorker := func() error {
+	handleWorker := func(ctx context.Context) error {
 		<-time.After(3 * time.Second)
 		return nil
 	}
@@ -210,7 +211,7 @@ func TestWorkerServer_Infos(t *testing.T) {
 
 func TestWorkerServer_RunFullFeatures(t *testing.T) {
 	err := New().Worker("test",
-		func() error {
+		func(ctx context.Context) error {
 			<-time.After(3 * time.Second)
 			return nil
 		},

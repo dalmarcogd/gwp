@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/dalmarcogd/gwp/internal"
 	"github.com/dalmarcogd/gwp/worker"
@@ -81,7 +82,7 @@ func (s STFakeServer) Healthy() bool {
 }
 
 func (STFakeServer) Workers() []*worker.Worker {
-	w := worker.NewWorker("w1", func() error {
+	w := worker.NewWorker("w1", func(ctx context.Context) error {
 		return nil
 	})
 	w.FinishedAt = time.Now().UTC()

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"github.com/dalmarcogd/gwp/worker"
 	"testing"
 	"time"
@@ -42,9 +43,11 @@ func (ParseFakeServer) Healthy() bool {
 }
 
 func (ParseFakeServer) Workers() []*worker.Worker {
-	w := worker.NewWorker("w1", func() error {
+	w := worker.NewWorker("w1", func(ctx context.Context) error {
 		return nil
 	})
+	deadline := worker.WithDeadline(time.Now())
+	deadline.Apply(w)
 	w.FinishedAt = time.Now().UTC()
 	return []*worker.Worker{
 		w,

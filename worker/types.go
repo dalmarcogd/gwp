@@ -31,11 +31,12 @@ type (
 		Name          string
 		StartAt       time.Time
 		FinishedAt    time.Time
-		Handle        func() error
+		Handle        func(ctx context.Context) error
 		Concurrency   int
 		RestartAlways bool
 		Restarts      int
 		Timeout       time.Duration
+		Cron          time.Duration
 		Deadline      time.Time
 		subWorkers    map[string]*SubWorker
 		ctx           context.Context
