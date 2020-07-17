@@ -133,10 +133,10 @@ func RunWorkers(ctx context.Context, workers []*Worker, handleError func(w *Work
 			defer wg.Done()
 			runWorker(ctx, w, errors)
 		}(ctx, worker)
-		go func(ctx context.Context, w *Worker) {
+		go func(w *Worker) {
 			defer wg.Done()
-			runWorkerHandleError(ctx, handleError, w, errors)
-		}(ctx, worker)
+			runWorkerHandleError(handleError, w, errors)
+		}(worker)
 	}
 	//Waiting all goroutines
 	wg.Wait()
@@ -164,33 +164,28 @@ func runWorker(ctx context.Context, w *Worker, errors chan WrapperHandleError) {
 	}
 }
 
-func runWorkerHandleError(ctx context.Context, handleError func(w *Worker, err error), worker *Worker, errors chan WrapperHandleError) {
+func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker, errors chan WrapperHandleError) {
 	log.Printf("Worker [%s] handleError started", worker.Name)
 	defer log.Printf("Worker [%s] handleError finished", worker.Name)
 
 	for err := range errors {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			if handleError != nil {
-				done := make(chan bool, 1)
-				go func(e WrapperHandleError) {
-					handleError(e.subWorker.Worker, e.err)
-					done <- true
-				}(err)
+		if handleError != nil {
+			done := make(chan bool, 1)
+			go func(e WrapperHandleError) {
+				handleError(e.subWorker.Worker, e.err)
+				done <- true
+			}(err)
 
-				select {
-				case <-time.After(10 * time.Second):
-					log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err.err)
-					break
-				case <-done:
-					log.Printf("Worker [%s] handleError handled: %v", worker.Name, err.err)
-					break
-				}
-			} else {
-				log.Printf("Worker [%s] error [%v] ignored", worker.Name, err.err)
+			select {
+			case <-time.After(10 * time.Second):
+				log.Printf("Worker [%s] handleError timeout for handling error: %v", worker.Name, err.err)
+				break
+			case <-done:
+				log.Printf("Worker [%s] handleError handled: %v", worker.Name, err.err)
+				break
 			}
+		} else {
+			log.Printf("Worker [%s] error [%v] ignored", worker.Name, err.err)
 		}
 	}
 }

@@ -243,6 +243,8 @@ func Test_runWorkerHandleError(t *testing.T) {
 	if !hasErrorHandled {
 		t.Error("Expected error handled")
 	}
+	cancelFunc()
+	ctx, cancelFunc = context.WithCancel(context.Background())
 
 	hasErrorUnhandled := true
 	handleErrors = func(w *Worker, err error) {
@@ -262,7 +264,7 @@ func Test_runWorkerHandleError(t *testing.T) {
 		}
 	}()
 
-	<-time.After(5 * time.Second)
+	<-time.After(3 * time.Second)
 	for _, worker := range workers {
 		if worker.Status()["w2-1"] != Error {
 			t.Error("Worker setup to return error but not returned")
@@ -272,20 +274,33 @@ func Test_runWorkerHandleError(t *testing.T) {
 		t.Error("Expected no error handled")
 	}
 
+	cancelFunc()
+	ctx, cancelFunc = context.WithCancel(context.Background())
+
 	workers = []*Worker{
 		NewWorker("w3",
 			func(ctx context.Context) error {
-				return errors.New("happened some error")
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+					return errors.New("happened some error")
+				}
 			}),
 	}
 
+	handleErrors = func(w *Worker, err error) {
+		time.Sleep(10 * time.Second)
+		hasErrorHandled = true
+	}
+
 	go func() {
-		if err := RunWorkers(ctx, workers, nil); err != nil {
+		if err := RunWorkers(ctx, workers, handleErrors); err != nil {
 			t.Error(err)
 		}
 	}()
 
-	<-time.After(1 * time.Second)
+	<-time.After(11 * time.Second)
 	for _, worker := range workers {
 		if worker.Status()["w3-1"] != Error {
 			t.Error("Worker setup to return error but not returned")
