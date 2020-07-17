@@ -307,4 +307,31 @@ func Test_runWorkerHandleError(t *testing.T) {
 		}
 	}
 	cancelFunc()
+	ctx, cancelFunc = context.WithCancel(context.Background())
+
+	workers = []*Worker{
+		NewWorker("w4",
+			func(ctx context.Context) error {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+					return errors.New("happened some error")
+				}
+			}),
+	}
+
+	go func() {
+		if err := RunWorkers(ctx, workers, nil); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	<-time.After(1 * time.Second)
+	for _, worker := range workers {
+		if worker.Status()["w4-1"] != Error {
+			t.Error("Worker setup to return error but not returned")
+		}
+	}
+	cancelFunc()
 }
