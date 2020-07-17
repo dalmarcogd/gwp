@@ -3,14 +3,16 @@ package gwp
 import (
 	"context"
 	"github.com/dalmarcogd/gwp/internal"
-	"github.com/dalmarcogd/gwp/monitor"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/monitor"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"log"
 	"net/http"
 )
 
 //WorkerServer is a server that administrate the workers and the monitor
 type WorkerServer struct {
+	rootContext context.Context
+	rootCancel  context.CancelFunc
 	config      map[string]interface{}
 	workers     map[string]*worker.Worker
 	handleError func(w *worker.Worker, err error)
@@ -135,11 +137,18 @@ func (s *WorkerServer) Configs() map[string]interface{} {
 
 //Run user to start the #WorkerServer
 func (s *WorkerServer) Run() error {
+	s.rootContext, s.rootCancel = context.WithCancel(context.Background())
 	monitor.SetupHTTP(s.config)
 	defer func() {
 		if err := monitor.CloseHTTP(); err != nil {
 			log.Printf("Error when closed monitor WorkerServer at: %s", err)
 		}
 	}()
-	return worker.RunWorkers(s.Workers(), s.handleError)
+	return worker.RunWorkers(s.rootContext, s.Workers(), s.handleError)
+}
+
+//GracefulStop stop the server gracefully
+func (s *WorkerServer) GracefulStop() error {
+	s.rootCancel()
+	return nil
 }

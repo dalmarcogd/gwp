@@ -1,8 +1,8 @@
 package monitor
 
 import (
-	"github.com/dalmarcogd/gwp/monitor/healthcheck"
-	"github.com/dalmarcogd/gwp/monitor/stats"
+	"github.com/dalmarcogd/gwp/pkg/monitor/healthcheck"
+	"github.com/dalmarcogd/gwp/pkg/monitor/stats"
 	"net/http"
 	"testing"
 	"time"

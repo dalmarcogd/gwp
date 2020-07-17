@@ -40,7 +40,7 @@ package main
 import (
 	"errors"
 	"github.com/dalmarcogd/gwp"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"log"
 	"time"
 )
@@ -85,7 +85,7 @@ package main
 
 import (
 	"github.com/dalmarcogd/gwp"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"log"
 	"time"
 )
@@ -137,7 +137,7 @@ package main
 
 import (
 	"github.com/dalmarcogd/gwp"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"log"
 	"time"
 )
@@ -198,7 +198,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/dalmarcogd/gwp"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"log"
 	"strconv"
 )
@@ -276,7 +276,7 @@ package main
 import (
 	"fmt"
 	"github.com/dalmarcogd/gwp"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -352,7 +352,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dalmarcogd/gwp"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"github.com/segmentio/kafka-go"
 	"log"
 	"time"

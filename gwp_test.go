@@ -2,8 +2,10 @@ package gwp
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
+	"log"
 	"net/http"
 	"testing"
 	"time"
@@ -118,12 +120,21 @@ func Test_server_DebugPprof(t *testing.T) {
 
 func Test_server_Run(t *testing.T) {
 	s := New().Worker("w1", func(ctx context.Context) error { return nil })
-	if err := s.Run(); err != nil {
-		t.Errorf("Error when run WorkerServer %v", err)
-	}
+	go func() {
+		if err := s.Run(); err != nil {
+			t.Errorf("Error when run WorkerServer %v", err)
+		}
+	}()
 	s = New().HealthCheck().DebugPprof().Stats().Worker("w2", func(ctx context.Context) error { return nil })
-	if err := s.Run(); err != nil {
-		t.Errorf("Error when run WorkerServer %v", err)
+	go func() {
+		if err := s.Run(); err != nil {
+			t.Errorf("Error when run WorkerServer %v", err)
+		}
+	}()
+
+	<-time.After(time.Second)
+	if err := s.GracefulStop(); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -202,7 +213,6 @@ func TestWorkerServer_Healthy(t *testing.T) {
 	}
 }
 
-
 func TestWorkerServer_Infos(t *testing.T) {
 	if infos := New().Infos(); infos == nil {
 		t.Error("Infos expected is but returned nil")
@@ -219,6 +229,57 @@ func TestWorkerServer_RunFullFeatures(t *testing.T) {
 		worker.WithDeadline(time.Now().Add(4*time.Second)),
 		worker.WithConcurrency(2)).Run()
 	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestExample_simpleWorker(t *testing.T) {
+	server := New().
+		Stats().
+		HealthCheck().
+		DebugPprof().
+		HandleError(func(w *worker.Worker, err error) {
+			log.Printf("Worker [%s] error: %s", w.Name, err)
+		}).
+		Worker(
+			"w1",
+			func(ctx context.Context) error {
+				select {
+				case <-time.After(5 * time.Second):
+					return errors.New("test w1")
+				case <-ctx.Done():
+					return nil
+				}
+			},
+			worker.WithRestartAlways()).
+		Worker(
+			"w2",
+			func(ctx context.Context) error {
+				select {
+				case <-time.After(10 * time.Second):
+					return nil
+				case <-ctx.Done():
+					return nil
+				}
+			}).
+		Worker(
+			"w3",
+			func(ctx context.Context) error {
+				select {
+				case <-time.After(15 * time.Second):
+					return errors.New("test w3")
+				case <-ctx.Done():
+					return nil
+				}
+			})
+	go func() {
+		if err := server.Run(); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	time.Sleep(16 * time.Second)
+	if err := server.GracefulStop(); err != nil {
 		t.Error(err)
 	}
 }

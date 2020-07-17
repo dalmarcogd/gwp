@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/dalmarcogd/gwp/worker"
+import "github.com/dalmarcogd/gwp/pkg/worker"
 
 type (
 	//Server interface that define the contract to be used between monitor.http and workerServer
