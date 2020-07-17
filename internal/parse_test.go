@@ -2,7 +2,7 @@ package internal
 
 import (
 	"context"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"testing"
 	"time"
 )

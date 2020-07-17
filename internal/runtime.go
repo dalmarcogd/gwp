@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 )
 
 var currentServer Server

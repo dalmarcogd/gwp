@@ -20,7 +20,6 @@ func NewWorker(name string, handle func(ctx context.Context) error, configs ...C
 		Handle:      handle,
 		Concurrency: 1,
 		subWorkers:  make(map[string]*SubWorker),
-		ctx:         context.Background(),
 	}
 	for _, config := range configs {
 		config.Apply(w)
@@ -36,12 +35,12 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 	for i := 1; i <= w.Concurrency; i++ {
 		ctx, cancel := getContext(w)
 
-		s := newSubWorker(ctx, i, w)
+		s := newSubWorker(ctx, cancel, i, w)
 		w.subWorkers[s.Name()] = s
 
 		wg.Add(1)
-		go func(subWorker *SubWorker, c context.Context, cancelFunc context.CancelFunc) {
-			defer wg.Done()
+		go func(subWorker *SubWorker, c context.Context, cancelFunc context.CancelFunc, group *sync.WaitGroup) {
+			defer group.Done()
 			defer cancelFunc()
 
 			if subWorker.Worker.Cron > 0 {
@@ -54,19 +53,18 @@ func (w *Worker) Run(errors chan WrapperHandleError) {
 				log.Printf("Worker [%v] finished: %v", subWorker.Name(), ctx.Err())
 			case <-s.Run(errors):
 				log.Printf("Worker [%v] finished", subWorker.Name())
-				cancelFunc()
 			}
-		}(s, ctx, cancel)
+		}(s, ctx, cancel, &wg)
 	}
 	wg.Wait()
 }
 
-func newSubWorker(ctx context.Context, id int, w *Worker) *SubWorker {
-	return &SubWorker{ID: id, Status: Started, Worker: w, ctx: ctx}
+func newSubWorker(ctx context.Context, cancelFunc context.CancelFunc,  id int, w *Worker) *SubWorker {
+	return &SubWorker{ID: id, Status: Started, Worker: w, ctx: ctx, cancelFunc: cancelFunc}
 }
 
 func getContext(w *Worker) (context.Context, context.CancelFunc) {
-	ctx, cancel := context.WithCancel(w.ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 	if w.Timeout > 0 {
 		ctx, cancel = context.WithTimeout(ctx, w.Timeout)
 	}
@@ -74,6 +72,13 @@ func getContext(w *Worker) (context.Context, context.CancelFunc) {
 		ctx, cancel = context.WithDeadline(ctx, w.Deadline)
 	}
 	return ctx, cancel
+}
+
+//Stop stop the subworker
+func (w *Worker) Stop() {
+	for _, worker := range w.subWorkers {
+		worker.Stop()
+	}
 }
 
 //Status return a map with status from the each #SubWorker
@@ -98,7 +103,7 @@ func (w *Worker) Healthy() bool {
 
 //Name return the name of #SubWorker
 //the pattern is %s-%s <- #Worker.Name, #SubWorker.ID
-func (s SubWorker) Name() string {
+func (s *SubWorker) Name() string {
 	return fmt.Sprintf("%s-%s", s.Worker.Name, strconv.Itoa(s.ID))
 }
 
@@ -121,18 +126,23 @@ func (s *SubWorker) Run(errors chan WrapperHandleError) chan bool {
 	return done
 }
 
+//Stop cancel the context
+func (s *SubWorker) Stop() {
+	s.cancelFunc()
+}
+
 //RunWorkers is a function that administrate the workers and yours errors
-func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error {
+func RunWorkers(ctx context.Context, workers []*Worker, handleError func(w *Worker, err error)) error {
 	var wg sync.WaitGroup
 
 	for _, worker := range workers {
 		errors := make(chan WrapperHandleError, worker.Concurrency)
 
 		wg.Add(2)
-		go func(w *Worker) {
+		go func(ctx context.Context, w *Worker) {
 			defer wg.Done()
-			runWorker(w, errors)
-		}(worker)
+			runWorker(ctx, w, errors)
+		}(ctx, worker)
 		go func(w *Worker) {
 			defer wg.Done()
 			runWorkerHandleError(handleError, w, errors)
@@ -144,24 +154,31 @@ func RunWorkers(workers []*Worker, handleError func(w *Worker, err error)) error
 	return nil
 }
 
-func runWorker(w *Worker, errors chan WrapperHandleError) {
+func runWorker(ctx context.Context, w *Worker, errors chan WrapperHandleError) {
 	log.Printf("Worker [%s] started", w.Name)
 	defer log.Printf("Worker [%s] finished", w.Name)
 	defer close(errors)
 	for {
-		w.Run(errors)
-		if !w.RestartAlways {
-			w.FinishedAt = time.Now().UTC()
-			break
+		select {
+		case <-ctx.Done():
+			w.Stop()
+			return
+		default:
+			w.Run(errors)
+			if !w.RestartAlways {
+				w.FinishedAt = time.Now().UTC()
+				return
+			}
+			w.Restarts++
+			log.Printf("Worker [%s] restarted", w.Name)
 		}
-		w.Restarts++
-		log.Printf("Worker [%s] restarted", w.Name)
 	}
 }
 
 func runWorkerHandleError(handleError func(w *Worker, err error), worker *Worker, errors chan WrapperHandleError) {
-	defer log.Printf("Worker [%s] handleError finished", worker.Name)
 	log.Printf("Worker [%s] handleError started", worker.Name)
+	defer log.Printf("Worker [%s] handleError finished", worker.Name)
+
 	for err := range errors {
 		if handleError != nil {
 			done := make(chan bool, 1)

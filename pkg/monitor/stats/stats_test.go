@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/dalmarcogd/gwp/internal"
-	"github.com/dalmarcogd/gwp/worker"
+	"github.com/dalmarcogd/gwp/pkg/worker"
 	"net/http"
 	"net/http/httptest"
 	"testing"

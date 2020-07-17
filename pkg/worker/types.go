@@ -18,11 +18,12 @@ type (
 	//SubWorker is a type that represents the concurrency, for the number of concurrency
 	//has an #SubWorker
 	SubWorker struct {
-		Worker *Worker
-		ID     int
-		Status string
-		Error  error
-		ctx    context.Context
+		Worker     *Worker
+		ID         int
+		Status     string
+		Error      error
+		ctx        context.Context
+		cancelFunc context.CancelFunc
 	}
 
 	//Worker is a type that represents an group of concurrency and keep some settings
@@ -39,7 +40,6 @@ type (
 		Cron          time.Duration
 		Deadline      time.Time
 		subWorkers    map[string]*SubWorker
-		ctx           context.Context
 	}
 
 	//WrapperHandleError is a wrapper to transport worker and the error generate inside worker
